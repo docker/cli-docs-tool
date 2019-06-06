@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/docker/buildx/commands"
 	"github.com/docker/cli/cli/command"
-	"github.com/docker/cli/cli/command/commands"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
-const descriptionSourcePath = "docs/reference/commandline/"
+const descriptionSourcePath = "docs/reference/"
 
 func generateCliYaml(opts *options) error {
 	dockerCLI, err := command.NewDockerCli()
@@ -25,7 +25,7 @@ func generateCliYaml(opts *options) error {
 		Use:   "docker [OPTIONS] COMMAND [ARG...]",
 		Short: "The base command for the Docker CLI.",
 	}
-	commands.AddCommands(cmd, dockerCLI)
+	cmd.AddCommand(commands.NewRootCmd("buildx", true, dockerCLI))
 	disableFlagsInUseLine(cmd)
 	source := filepath.Join(opts.source, descriptionSourcePath)
 	fmt.Println("Markdown source:", source)

@@ -86,9 +86,9 @@ func GenYamlTreeCustom(cmd *cobra.Command, dir string, filePrepender func(string
 	// the "docker" command, and is a "dummy" with no flags, and only a single
 	// subcommand (the plugin's top command). For plugins, we should skip the
 	// root command altogether, to prevent generating a useless YAML file.
-	// if !cmd.HasParent() {
-	// 	return nil
-	// }
+	if !cmd.HasParent() {
+		return nil
+	}
 
 	basename := strings.Replace(cmd.CommandPath(), " ", "_", -1) + ".yaml"
 	filename := filepath.Join(dir, basename)
