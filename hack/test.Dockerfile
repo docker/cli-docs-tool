@@ -3,6 +3,7 @@ ARG GO_VERSION
 
 FROM golang:${GO_VERSION}-alpine AS base
 RUN apk add --no-cache gcc linux-headers musl-dev
+ENV CGO_ENABLED=0
 WORKDIR /src
 
 FROM base AS gomod
@@ -14,7 +15,7 @@ FROM gomod AS test
 RUN --mount=type=bind,target=. \
   --mount=type=cache,target=/go/pkg/mod \
   --mount=type=cache,target=/root/.cache/go-build \
-  go test -v -coverprofile=/tmp/coverage.txt -covermode=atomic -race ./...
+  go test -v -coverprofile=/tmp/coverage.txt -covermode=atomic ./...
 
 FROM scratch AS test-coverage
 COPY --from=test /tmp/coverage.txt /coverage.txt

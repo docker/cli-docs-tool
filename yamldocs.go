@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 type cmdOption struct {
@@ -53,13 +53,17 @@ type cmdDoc struct {
 	OSType           string `yaml:"os_type,omitempty"`
 }
 
-// GenYamlTree creates yaml structured ref files
+// GenYamlTree creates yaml structured ref files for this command and all descendants
+// in the directory given. This function may not work
+// correctly if your command names have `-` in them. If you have `cmd` with two
+// subcmds, `sub` and `sub-third`, and `sub` has a subcommand called `third`
+// it is undefined which help output will be in the file `cmd-sub-third.1`.
 func GenYamlTree(cmd *cobra.Command, dir string) error {
 	emptyStr := func(s string) string { return "" }
 	return GenYamlTreeCustom(cmd, dir, emptyStr)
 }
 
-// GenYamlTreeCustom creates yaml structured ref files
+// GenYamlTreeCustom creates yaml structured ref files.
 func GenYamlTreeCustom(cmd *cobra.Command, dir string, filePrepender func(string) string) error {
 	for _, c := range cmd.Commands() {
 		if !c.Runnable() && !c.HasAvailableSubCommands() {
@@ -104,7 +108,7 @@ func GenYamlTreeCustom(cmd *cobra.Command, dir string, filePrepender func(string
 	return GenYamlCustom(cmd, f)
 }
 
-// GenYamlCustom creates custom yaml output
+// GenYamlCustom creates custom yaml output.
 // nolint: gocyclo
 func GenYamlCustom(cmd *cobra.Command, w io.Writer) error {
 	const (
@@ -314,9 +318,9 @@ func hasSeeAlso(cmd *cobra.Command) bool {
 	return false
 }
 
-// applyDescriptionAndExamples fills in cmd.Long and cmd.Example with the
+// ApplyDescriptionAndExamples fills in cmd.Long and cmd.Example with the
 // "Description" and "Examples" H2 sections in  mdString (if present).
-func applyDescriptionAndExamples(cmd *cobra.Command, mdString string) {
+func ApplyDescriptionAndExamples(cmd *cobra.Command, mdString string) {
 	sections := getSections(mdString)
 	var (
 		anchors []string

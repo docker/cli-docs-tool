@@ -3,6 +3,7 @@ ARG GO_VERSION
 
 FROM golang:${GO_VERSION}-alpine AS base
 RUN apk add --no-cache linux-headers
+ENV CGO_ENABLED=0
 WORKDIR /src
 
 FROM golangci/golangci-lint:v1.37-alpine AS golangci-lint
