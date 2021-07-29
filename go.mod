@@ -1,4 +1,4 @@
-module github.com/crazy-max/yamldocs
+module github.com/docker/yamldocs
 
 go 1.16
 

@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/crazy-max/yamldocs"
 	"github.com/docker/buildx/commands"
 	"github.com/docker/cli/cli/command"
+	"github.com/docker/yamldocs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
