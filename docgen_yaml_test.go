@@ -1,4 +1,4 @@
-package yamldocs
+package docgen
 
 import (
 	"io/ioutil"

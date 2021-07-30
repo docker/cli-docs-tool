@@ -1,8 +1,10 @@
-package yamldocs
+package docgen
 
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -318,9 +320,41 @@ func hasSeeAlso(cmd *cobra.Command) bool {
 	return false
 }
 
-// ApplyDescriptionAndExamples fills in cmd.Long and cmd.Example with the
+// LoadLongDescription gets long descriptions and examples from markdown.
+func LoadLongDescription(parentCmd *cobra.Command, path string) error {
+	for _, cmd := range parentCmd.Commands() {
+		if cmd.HasSubCommands() {
+			if err := LoadLongDescription(cmd, path); err != nil {
+				return err
+			}
+		}
+		name := cmd.CommandPath()
+		log.Println("INFO: Generating docs for", name)
+		if i := strings.Index(name, " "); i >= 0 {
+			// remove root command / binary name
+			name = name[i+1:]
+		}
+		if name == "" {
+			continue
+		}
+		mdFile := strings.ReplaceAll(name, " ", "_") + ".md"
+		fullPath := filepath.Join(path, mdFile)
+		content, err := ioutil.ReadFile(fullPath)
+		if os.IsNotExist(err) {
+			log.Printf("WARN: %s does not exist, skipping\n", mdFile)
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		applyDescriptionAndExamples(cmd, string(content))
+	}
+	return nil
+}
+
+// applyDescriptionAndExamples fills in cmd.Long and cmd.Example with the
 // "Description" and "Examples" H2 sections in  mdString (if present).
-func ApplyDescriptionAndExamples(cmd *cobra.Command, mdString string) {
+func applyDescriptionAndExamples(cmd *cobra.Command, mdString string) {
 	sections := getSections(mdString)
 	var (
 		anchors []string

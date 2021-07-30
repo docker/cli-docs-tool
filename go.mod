@@ -1,4 +1,4 @@
-module github.com/docker/yamldocs
+module github.com/docker/docgen
 
 go 1.16
 
