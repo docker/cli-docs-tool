@@ -62,6 +62,9 @@ type cmdDoc struct {
 // it is undefined which help output will be in the file `cmd-sub-third.1`.
 func GenYamlTree(cmd *cobra.Command, dir string) error {
 	emptyStr := func(s string) string { return "" }
+	if err := loadLongDescription(cmd, dir); err != nil {
+		return err
+	}
 	return GenYamlTreeCustom(cmd, dir, emptyStr)
 }
 
@@ -320,16 +323,16 @@ func hasSeeAlso(cmd *cobra.Command) bool {
 	return false
 }
 
-// LoadLongDescription gets long descriptions and examples from markdown.
-func LoadLongDescription(parentCmd *cobra.Command, path string) error {
+// loadLongDescription gets long descriptions and examples from markdown.
+func loadLongDescription(parentCmd *cobra.Command, path string) error {
 	for _, cmd := range parentCmd.Commands() {
 		if cmd.HasSubCommands() {
-			if err := LoadLongDescription(cmd, path); err != nil {
+			if err := loadLongDescription(cmd, path); err != nil {
 				return err
 			}
 		}
 		name := cmd.CommandPath()
-		log.Println("INFO: Generating docs for", name)
+		log.Println("INFO: Generating YAML docs for", name)
 		if i := strings.Index(name, " "); i >= 0 {
 			// remove root command / binary name
 			name = name[i+1:]

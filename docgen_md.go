@@ -15,9 +15,11 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func GenMarkdown(cmd *cobra.Command, dir string) error {
+// GenMarkdownTree will generate a markdown page for this command and all
+// descendants in the directory given.
+func GenMarkdownTree(cmd *cobra.Command, dir string) error {
 	for _, c := range cmd.Commands() {
-		if err := GenMarkdown(c, dir); err != nil {
+		if err := GenMarkdownTree(c, dir); err != nil {
 			return err
 		}
 	}
@@ -25,11 +27,11 @@ func GenMarkdown(cmd *cobra.Command, dir string) error {
 		return nil
 	}
 
+	log.Printf("INFO: Generating Markdown docs for %s", cmd.CommandPath())
 	mdFile := mdFilename(cmd)
 	fullPath := filepath.Join(dir, mdFile)
 
 	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
-		log.Printf("INFO: Init markdown for %s", cmd.CommandPath())
 		var icBuf bytes.Buffer
 		icTpl, err := template.New("ic").Option("missingkey=error").Parse(`# {{ .Command }}
 
@@ -83,7 +85,6 @@ func GenMarkdown(cmd *cobra.Command, dir string) error {
 		return errors.Wrapf(err, "failed to write %s", fullPath)
 	}
 
-	log.Printf("INFO: Markdown updated for %s", cmd.CommandPath())
 	return nil
 }
 

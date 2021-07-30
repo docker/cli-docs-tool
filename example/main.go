@@ -33,19 +33,10 @@ func main() {
 	cwd, _ := os.Getwd()
 	source := filepath.Join(cwd, sourcePath)
 
-	if err = os.MkdirAll(sourcePath, 0755); err != nil {
+	if err = os.MkdirAll(source, 0755); err != nil {
 		log.Printf("ERROR: %+v", err)
 	}
-
-	if err = docgen.GenMarkdown(cmd, sourcePath); err != nil {
-		log.Printf("ERROR: %+v", err)
-	}
-
-	if err := docgen.LoadLongDescription(cmd, source); err != nil {
-		log.Printf("ERROR: %+v", err)
-	}
-
-	if err = docgen.GenYamlTree(cmd, sourcePath); err != nil {
+	if err = docgen.GenTree(cmd, source); err != nil {
 		log.Printf("ERROR: %+v", err)
 	}
 }
