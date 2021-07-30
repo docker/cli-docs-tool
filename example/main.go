@@ -18,7 +18,7 @@ func main() {
 
 	dockerCLI, err := command.NewDockerCli()
 	if err != nil {
-		log.Printf("error: %+v", err)
+		log.Printf("ERROR: %+v", err)
 	}
 
 	cmd := &cobra.Command{
@@ -32,15 +32,20 @@ func main() {
 
 	cwd, _ := os.Getwd()
 	source := filepath.Join(cwd, sourcePath)
-	if err := docgen.LoadLongDescription(cmd, source); err != nil {
-		log.Printf("error: %+v", err)
-	}
 
 	if err = os.MkdirAll(sourcePath, 0755); err != nil {
-		log.Printf("error: %+v", err)
+		log.Printf("ERROR: %+v", err)
+	}
+
+	if err = docgen.GenMarkdown(cmd, sourcePath); err != nil {
+		log.Printf("ERROR: %+v", err)
+	}
+
+	if err := docgen.LoadLongDescription(cmd, source); err != nil {
+		log.Printf("ERROR: %+v", err)
 	}
 
 	if err = docgen.GenYamlTree(cmd, sourcePath); err != nil {
-		log.Printf("error: %+v", err)
+		log.Printf("ERROR: %+v", err)
 	}
 }
