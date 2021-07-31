@@ -11,6 +11,10 @@ import (
 
 func TestGenYamlTree(t *testing.T) {
 	c := &cobra.Command{Use: "do [OPTIONS] arg1 arg2"}
+	s := &cobra.Command{Use: "sub [OPTIONS] arg1 arg2", Run: func(cmd *cobra.Command, args []string) {
+		return
+	}}
+	c.AddCommand(s)
 
 	tmpdir, err := ioutil.TempDir("", "test-gen-yaml-tree")
 	if err != nil {
@@ -22,7 +26,7 @@ func TestGenYamlTree(t *testing.T) {
 		t.Fatalf("GenYamlTree failed: %s", err.Error())
 	}
 
-	if _, err := os.Stat(filepath.Join(tmpdir, "do.yaml")); err != nil {
-		t.Fatalf("Expected file 'do.yaml' to exist")
+	if _, err := os.Stat(filepath.Join(tmpdir, "do_sub.yaml")); err != nil {
+		t.Fatalf("Expected file 'do_sub.yaml' to exist")
 	}
 }
