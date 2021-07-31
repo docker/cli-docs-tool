@@ -6,10 +6,15 @@
 
 Doc generator specially crafted for [Docker CLI](https://github.com/docker/cli) plugins.
 
-## Installation
+## Usage
 
 ```
 go get github.com/docker/docgen
 ```
 
 Basic usage available in [example](example) folder.
+
+## Contributing
+
+Want to contribute to Buildx? Awesome! You can find information about
+contributing to this project in the [CONTRIBUTING.md](/.github/CONTRIBUTING.md)
