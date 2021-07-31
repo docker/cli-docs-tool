@@ -96,8 +96,18 @@ func mdFilename(cmd *cobra.Command) string {
 	return strings.ReplaceAll(name, " ", "_") + ".md"
 }
 
-func mdMakeLink(txt, link string) string {
-	return "[" + txt + "](#" + link + ")"
+func mdMakeLink(txt, link string, f *pflag.Flag, isAnchor bool) string {
+	link = "#" + link
+	annotations, ok := f.Annotations["docs.external.url"]
+	if ok && len(annotations) > 0 {
+		link = annotations[0]
+	} else {
+		if !isAnchor {
+			return txt
+		}
+	}
+
+	return "[" + txt + "](" + link + ")"
 }
 
 func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
@@ -146,9 +156,7 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 			fmt.Fprint(b, "| ")
 			if f.Shorthand != "" {
 				name := "`-" + f.Shorthand + "`"
-				if isLink {
-					name = mdMakeLink(name, f.Name)
-				}
+				name = mdMakeLink(name, f.Name, f, isLink)
 				fmt.Fprintf(b, "%s, ", name)
 			}
 			name := "`--" + f.Name
@@ -156,9 +164,7 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 				name += " " + f.Value.Type()
 			}
 			name += "`"
-			if isLink {
-				name = mdMakeLink(name, f.Name)
-			}
+			name = mdMakeLink(name, f.Name, f, isLink)
 			fmt.Fprintf(b, "%s | %s |\n", name, f.Usage)
 		})
 		fmt.Fprintln(b, "")
