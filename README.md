@@ -16,5 +16,5 @@ Basic usage available in [example](example) folder.
 
 ## Contributing
 
-Want to contribute to Buildx? Awesome! You can find information about
-contributing to this project in the [CONTRIBUTING.md](/.github/CONTRIBUTING.md)
+Want to contribute? Awesome! You can find information about contributing to
+this project in the [CONTRIBUTING.md](/.github/CONTRIBUTING.md)
