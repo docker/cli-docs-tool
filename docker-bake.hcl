@@ -45,3 +45,16 @@ target "test" {
   target = "test-coverage"
   output = ["."]
 }
+
+variable "GITHUB_REPOSITORY" {}
+variable "GITHUB_REF" {}
+target "godev" {
+  args = {
+    GO_VERSION = GO_VERSION
+    GITHUB_REPOSITORY = GITHUB_REPOSITORY
+    GITHUB_REF = GITHUB_REF
+  }
+  dockerfile = "./hack/godev.Dockerfile"
+  target = "godev"
+  output = ["type=cacheonly"]
+}

@@ -10,13 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
-        name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-      -
         name: Call pkg.go.dev
-        run: |
-          go get github.com/${GITHUB_REPOSITORY}@${GITHUB_REF#refs/tags/}
-        env:
-          GOPROXY: https://proxy.golang.org
+        uses: docker/bake-action@v1
+        with:
+          targets: godev
