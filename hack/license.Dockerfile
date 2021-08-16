@@ -15,22 +15,30 @@
 # limitations under the License.
 
 ARG GO_VERSION
+ARG ADDLICENSE_VERSION="d43bb61fdfdafb29f4b1add4b849c5bfe4eeb497"
+ARG LICENSE_ARGS="-c docgen -l apache"
+ARG LICENSE_FILES=".*\(Dockerfile\|\.go\|\.hcl\|\.sh\)"
 
 FROM golang:${GO_VERSION}-alpine AS base
-RUN apk add --no-cache gcc linux-headers musl-dev
-ENV CGO_ENABLED=0
 WORKDIR /src
+RUN apk add --no-cache cpio findutils git
+ENV CGO_ENABLED=0
+ARG ADDLICENSE_VERSION
+RUN go install github.com/google/addlicense@${ADDLICENSE_VERSION}
 
-FROM base AS gomod
+FROM base AS set
+ARG LICENSE_ARGS
+ARG LICENSE_FILES
 RUN --mount=type=bind,target=.,rw \
-  --mount=type=cache,target=/go/pkg/mod \
-  go mod tidy && go mod download
+  find . -regex "${LICENSE_FILES}" | xargs addlicense ${LICENSE_ARGS} \
+  && mkdir /out \
+  && find . -regex "${LICENSE_FILES}" | cpio -pdm /out
 
-FROM gomod AS test
+FROM scratch AS update
+COPY --from=set /out /
+
+FROM base AS validate
+ARG LICENSE_ARGS
+ARG LICENSE_FILES
 RUN --mount=type=bind,target=. \
-  --mount=type=cache,target=/go/pkg/mod \
-  --mount=type=cache,target=/root/.cache/go-build \
-  go test -v -coverprofile=/tmp/coverage.txt -covermode=atomic ./...
-
-FROM scratch AS test-coverage
-COPY --from=test /tmp/coverage.txt /coverage.txt
+  find . -regex "${LICENSE_FILES}" | xargs addlicense -check ${LICENSE_ARGS}
