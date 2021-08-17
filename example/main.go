@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const sourcePath = "docs/reference/"
+const sourcePath = "docs/"
 
 func main() {
 	log.SetFlags(0)
