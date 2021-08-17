@@ -74,18 +74,12 @@ target "godev" {
 }
 
 target "license-validate" {
-  args = {
-    GO_VERSION = GO_VERSION
-  }
   dockerfile = "./hack/license.Dockerfile"
   target = "validate"
   output = ["type=cacheonly"]
 }
 
 target "license-update" {
-  args = {
-    GO_VERSION = GO_VERSION
-  }
   dockerfile = "./hack/license.Dockerfile"
   target = "update"
   output = ["."]

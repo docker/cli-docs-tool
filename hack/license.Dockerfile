@@ -14,22 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG GO_VERSION
-ARG ADDLICENSE_VERSION="d43bb61fdfdafb29f4b1add4b849c5bfe4eeb497"
 ARG LICENSE_ARGS="-c docgen -l apache"
 ARG LICENSE_FILES=".*\(Dockerfile\|\.go\|\.hcl\|\.sh\)"
 
-FROM golang:${GO_VERSION}-alpine AS base
+FROM ghcr.io/google/addlicense:v1.0.0 AS addlicense
+
+FROM alpine:3.14 AS base
 WORKDIR /src
 RUN apk add --no-cache cpio findutils git
-ENV CGO_ENABLED=0
-ARG ADDLICENSE_VERSION
-RUN go install github.com/google/addlicense@${ADDLICENSE_VERSION}
 
 FROM base AS set
 ARG LICENSE_ARGS
 ARG LICENSE_FILES
 RUN --mount=type=bind,target=.,rw \
+  --mount=from=addlicense,source=/app/addlicense,target=/usr/bin/addlicense \
   find . -regex "${LICENSE_FILES}" | xargs addlicense ${LICENSE_ARGS} \
   && mkdir /out \
   && find . -regex "${LICENSE_FILES}" | cpio -pdm /out
@@ -41,4 +39,5 @@ FROM base AS validate
 ARG LICENSE_ARGS
 ARG LICENSE_FILES
 RUN --mount=type=bind,target=. \
+  --mount=from=addlicense,source=/app/addlicense,target=/usr/bin/addlicense \
   find . -regex "${LICENSE_FILES}" | xargs addlicense -check ${LICENSE_ARGS}
