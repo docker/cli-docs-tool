@@ -112,7 +112,7 @@ func GenYamlTreeCustom(cmd *cobra.Command, dir string, filePrepender func(string
 	if !cmd.HasParent() {
 		return nil
 	}
-
+	log.Printf("INFO: Generating YAML for %q", cmd.CommandPath())
 	basename := strings.Replace(cmd.CommandPath(), " ", "_", -1) + ".yaml"
 	filename := filepath.Join(dir, basename)
 	f, err := os.Create(filename)
@@ -346,7 +346,6 @@ func loadLongDescription(parentCmd *cobra.Command, path string) error {
 			}
 		}
 		name := cmd.CommandPath()
-		log.Println("INFO: Generating YAML docs for", name)
 		if i := strings.Index(name, " "); i >= 0 {
 			// remove root command / binary name
 			name = name[i+1:]
@@ -358,7 +357,7 @@ func loadLongDescription(parentCmd *cobra.Command, path string) error {
 		fullPath := filepath.Join(path, mdFile)
 		content, err := ioutil.ReadFile(fullPath)
 		if os.IsNotExist(err) {
-			log.Printf("WARN: %s does not exist, skipping\n", mdFile)
+			log.Printf("WARN: %s does not exist, skipping Markdown examples for YAML doc\n", mdFile)
 			continue
 		}
 		if err != nil {

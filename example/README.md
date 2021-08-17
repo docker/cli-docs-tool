@@ -1,6 +1,7 @@
 # Example
 
-The following example will generate YAML and Markdown for [Docker buildx](https://github.com/docker/buildx) CLI plugin.
+The following example will generate YAML and Markdown docs for
+[Docker buildx](https://github.com/docker/buildx) CLI.
 
 ```console
 git clone https://github.com/docker/docgen

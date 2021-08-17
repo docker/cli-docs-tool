@@ -41,7 +41,7 @@ func GenMarkdownTree(cmd *cobra.Command, dir string) error {
 		return nil
 	}
 
-	log.Printf("INFO: Generating Markdown docs for %s", cmd.CommandPath())
+	log.Printf("INFO: Generating Markdown for %q", cmd.CommandPath())
 	mdFile := mdFilename(cmd)
 	fullPath := filepath.Join(dir, mdFile)
 
