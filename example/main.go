@@ -1,4 +1,4 @@
-// Copyright 2021 docgen authors
+// Copyright 2021 cli-docs-tool authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import (
 	"path/filepath"
 
 	"github.com/docker/buildx/commands"
+	clidocstool "github.com/docker/cli-docs-tool"
 	"github.com/docker/cli/cli/command"
-	"github.com/docker/docgen"
 	"github.com/spf13/cobra"
 )
 
@@ -42,7 +42,7 @@ func main() {
 	}
 
 	cmd.AddCommand(commands.NewRootCmd("buildx", true, dockerCLI))
-	docgen.DisableFlagsInUseLine(cmd)
+	clidocstool.DisableFlagsInUseLine(cmd)
 
 	cwd, _ := os.Getwd()
 	source := filepath.Join(cwd, sourcePath)
@@ -50,7 +50,7 @@ func main() {
 	if err = os.MkdirAll(source, 0755); err != nil {
 		log.Printf("ERROR: %+v", err)
 	}
-	if err = docgen.GenTree(cmd, source); err != nil {
+	if err = clidocstool.GenTree(cmd, source); err != nil {
 		log.Printf("ERROR: %+v", err)
 	}
 }

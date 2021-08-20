@@ -1,4 +1,4 @@
-module github.com/docker/docgen
+module github.com/docker/cli-docs-tool
 
 go 1.16
 
