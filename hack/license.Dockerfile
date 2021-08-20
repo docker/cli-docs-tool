@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.3
 
-# Copyright 2021 docgen authors
+# Copyright 2021 cli-docs-tool authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG LICENSE_ARGS="-c docgen -l apache"
+ARG LICENSE_ARGS="-c cli-docs-tool -l apache"
 ARG LICENSE_FILES=".*\(Dockerfile\|\.go\|\.hcl\|\.sh\)"
 
 FROM ghcr.io/google/addlicense:v1.0.0 AS addlicense

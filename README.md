@@ -1,6 +1,6 @@
-[![PkgGoDev](https://img.shields.io/badge/go.dev-docs-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/docker/docgen)
-[![Test Status](https://img.shields.io/github/workflow/status/crazy-max/docgen/build?label=test&logo=github&style=flat-square)](https://github.com/docker/docgen/actions?query=workflow%3Atest)
-[![Go Report Card](https://goreportcard.com/badge/github.com/docker/docgen)](https://goreportcard.com/report/github.com/docker/docgen)
+[![PkgGoDev](https://img.shields.io/badge/go.dev-docs-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/docker/cli-docs-tool)
+[![Test Status](https://img.shields.io/github/workflow/status/docker/cli-docs-tool/build?label=test&logo=github&style=flat-square)](https://github.com/docker/cli-docs-tool/actions?query=workflow%3Atest)
+[![Go Report Card](https://goreportcard.com/badge/github.com/docker/cli-docs-tool)](https://goreportcard.com/report/github.com/docker/cli-docs-tool)
 
 ## About
 
@@ -26,7 +26,7 @@ We will use the example of `docker/buildx` and create a Go submodule in a
 $ mkdir docs
 $ cd ./docs
 $ go mod init github.com/docker/buildx/docs
-$ go get github.com/docker/docgen
+$ go get github.com/docker/cli-docs-tool
 ```
 
 Your `go.mod` should look like this:
@@ -37,7 +37,7 @@ module github.com/docker/buildx/docs
 go 1.16
 
 require (
-	github.com/docker/docgen v0.0.0
+	github.com/docker/cli-docs-tool v0.0.0
 )
 ```
 
@@ -54,7 +54,7 @@ import (
 
   "github.com/docker/buildx/commands"
   "github.com/docker/cli/cli/command"
-  "github.com/docker/docgen"
+  clidocstool "github.com/docker/cli-docs-tool"
   "github.com/spf13/cobra"
 )
 
@@ -75,7 +75,7 @@ func main() {
   }
 
   cmd.AddCommand(commands.NewRootCmd("buildx", true, dockerCLI))
-  docgen.DisableFlagsInUseLine(cmd)
+  clidocstool.DisableFlagsInUseLine(cmd)
 
   cwd, _ := os.Getwd()
   source := filepath.Join(cwd, sourcePath)
@@ -86,7 +86,7 @@ func main() {
   }
   
   // Generate Markdown and YAML documentation to "source" folder
-  if err = docgen.GenTree(cmd, source); err != nil {
+  if err = clidocstool.GenTree(cmd, source); err != nil {
     log.Printf("ERROR: %+v", err)
   }
 }
@@ -95,7 +95,7 @@ func main() {
 Here we create a new instance of Docker CLI with `command.NewDockerCli` and a
 subcommand `commands.NewRootCmd` for `buildx`.
 
-Finally, we generate Markdown and YAML documentation with `docgen.GenTree`.
+Finally, we generate Markdown and YAML documentation with `clidocstool.GenTree`.
 
 ```console
 $ go run main.go
