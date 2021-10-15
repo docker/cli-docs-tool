@@ -1,7 +1,10 @@
-command: do sub
-usage: do sub [OPTIONS] arg1 arg2 [flags]
-pname: do
-plink: do.yaml
+command: docker buildx build
+aliases: b
+short: Start a build
+long: Start a build
+usage: docker buildx build [OPTIONS] PATH | URL | - [flags]
+pname: docker buildx
+plink: docker_buildx.yaml
 options:
 - option: add-host
   value_type: stringSlice

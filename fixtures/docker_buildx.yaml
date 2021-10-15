@@ -1,0 +1,15 @@
+command: docker buildx
+short: Build with BuildKit
+long: Build with BuildKit
+pname: docker
+plink: docker.yaml
+cname:
+- docker buildx build
+clink:
+- docker_buildx_build.yaml
+deprecated: false
+experimental: false
+experimentalcli: false
+kubernetes: false
+swarm: false
+

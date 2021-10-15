@@ -31,21 +31,25 @@ import (
 
 // GenMarkdownTree will generate a markdown page for this command and all
 // descendants in the directory given.
-func GenMarkdownTree(cmd *cobra.Command, dir string) error {
-	for _, c := range cmd.Commands() {
-		if err := GenMarkdownTree(c, dir); err != nil {
+func (c *Client) GenMarkdownTree(cmd *cobra.Command) error {
+	for _, sc := range cmd.Commands() {
+		if err := c.GenMarkdownTree(sc); err != nil {
 			return err
 		}
 	}
-	if !cmd.HasParent() {
+
+	// Skip the root command altogether, to prevent generating a useless
+	// md file for plugins.
+	if c.plugin && !cmd.HasParent() {
 		return nil
 	}
 
 	log.Printf("INFO: Generating Markdown for %q", cmd.CommandPath())
 	mdFile := mdFilename(cmd)
-	fullPath := filepath.Join(dir, mdFile)
+	sourcePath := filepath.Join(c.source, mdFile)
+	targetPath := filepath.Join(c.target, mdFile)
 
-	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+	if !fileExists(sourcePath) {
 		var icBuf bytes.Buffer
 		icTpl, err := template.New("ic").Option("missingkey=error").Parse(`# {{ .Command }}
 
@@ -63,12 +67,14 @@ func GenMarkdownTree(cmd *cobra.Command, dir string) error {
 		}); err != nil {
 			return err
 		}
-		if err = ioutil.WriteFile(fullPath, icBuf.Bytes(), 0644); err != nil {
+		if err = ioutil.WriteFile(targetPath, icBuf.Bytes(), 0644); err != nil {
 			return err
 		}
+	} else if err := copyFile(sourcePath, targetPath); err != nil {
+		return err
 	}
 
-	content, err := ioutil.ReadFile(fullPath)
+	content, err := ioutil.ReadFile(targetPath)
 	if err != nil {
 		return err
 	}
@@ -91,12 +97,12 @@ func GenMarkdownTree(cmd *cobra.Command, dir string) error {
 	}
 	cont := cs[:start] + "<!---MARKER_GEN_START-->" + "\n" + out + "\n" + cs[end:]
 
-	fi, err := os.Stat(fullPath)
+	fi, err := os.Stat(targetPath)
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(fullPath, []byte(cont), fi.Mode()); err != nil {
-		return errors.Wrapf(err, "failed to write %s", fullPath)
+	if err = ioutil.WriteFile(targetPath, []byte(cont), fi.Mode()); err != nil {
+		return errors.Wrapf(err, "failed to write %s", targetPath)
 	}
 
 	return nil

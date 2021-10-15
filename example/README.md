@@ -1,6 +1,6 @@
 # Example
 
-The following example will generate YAML and Markdown docs for
+The following example will generate all supported docs for
 [Docker buildx](https://github.com/docker/buildx) CLI.
 
 ```console

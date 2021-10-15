@@ -17,40 +17,72 @@ package main
 import (
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/docker/buildx/commands"
 	clidocstool "github.com/docker/cli-docs-tool"
 	"github.com/docker/cli/cli/command"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
-const sourcePath = "docs/"
+const (
+	pluginName        = "buildx"
+	defaultSourcePath = "docs/"
+)
 
-func main() {
+type options struct {
+	source string
+	target string
+}
+
+func gen(opts *options) error {
 	log.SetFlags(0)
 
+	// create a new instance of Docker CLI
 	dockerCLI, err := command.NewDockerCli()
 	if err != nil {
-		log.Printf("ERROR: %+v", err)
+		return err
 	}
 
+	// root command
 	cmd := &cobra.Command{
-		Use:               "docker [OPTIONS] COMMAND [ARG...]",
-		Short:             "The base command for the Docker CLI.",
-		DisableAutoGenTag: true,
+		Use:   "buildx",
+		Short: "Build with BuildKit",
 	}
 
-	cmd.AddCommand(commands.NewRootCmd("buildx", true, dockerCLI))
-	clidocstool.DisableFlagsInUseLine(cmd)
+	// subcommand for the plugin
+	cmd.AddCommand(commands.NewRootCmd(pluginName, true, dockerCLI))
 
-	cwd, _ := os.Getwd()
-	source := filepath.Join(cwd, sourcePath)
-
-	if err = os.MkdirAll(source, 0755); err != nil {
-		log.Printf("ERROR: %+v", err)
+	// create a new instance of cli-docs-tool
+	c, err := clidocstool.New(clidocstool.Options{
+		Root:      cmd,
+		SourceDir: opts.source,
+		TargetDir: opts.target,
+		Plugin:    true,
+	})
+	if err != nil {
+		return err
 	}
-	if err = clidocstool.GenTree(cmd, source); err != nil {
+	c.DisableFlagsInUseLine()
+
+	// generate all supported docs formats
+	return c.GenAllTree()
+}
+
+func run() error {
+	opts := &options{}
+	flags := pflag.NewFlagSet(os.Args[0], pflag.ContinueOnError)
+	flags.StringVar(&opts.source, "source", defaultSourcePath, "Docs source folder")
+	flags.StringVar(&opts.target, "target", defaultSourcePath, "Docs target folder")
+	if err := flags.Parse(os.Args[1:]); err != nil {
+		return err
+	}
+	return gen(opts)
+}
+
+func main() {
+	if err := run(); err != nil {
 		log.Printf("ERROR: %+v", err)
+		os.Exit(1)
 	}
 }
