@@ -14,6 +14,7 @@ Start a build
 | [`--add-host stringSlice`](https://docs.docker.com/engine/reference/commandline/build/#add-entries-to-container-hosts-file---add-host) | Add a custom host-to-IP mapping (host:ip) |
 | `--allow stringSlice` | Allow extra privileged entitlement, e.g. network.host, security.insecure |
 | [`--build-arg stringArray`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg) | Set build-time variables |
+| `--builder string` | Override the configured builder instance |
 | `--cache-from stringArray` | External cache sources (eg. user/app:cache, type=local,src=path/to/dir) |
 | `--cache-to stringArray` | Cache export destinations (eg. user/app:cache, type=local,dest=path/to/dir) |
 | `--compress` | Compress the build context using gzip |

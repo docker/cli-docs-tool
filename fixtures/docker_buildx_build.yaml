@@ -2,7 +2,7 @@ command: docker buildx build
 aliases: b
 short: Start a build
 long: Start a build
-usage: docker buildx build [OPTIONS] PATH | URL | - [flags]
+usage: docker buildx build [OPTIONS] PATH | URL | -
 pname: docker buildx
 plink: docker_buildx.yaml
 options:
@@ -208,6 +208,15 @@ options:
 - option: ulimit
   value_type: string
   description: Ulimit options
+  deprecated: false
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+inherited_options:
+- option: builder
+  value_type: string
+  description: Override the configured builder instance
   deprecated: false
   experimental: false
   experimentalcli: false

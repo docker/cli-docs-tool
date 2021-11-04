@@ -22,6 +22,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	// AnnotationExternalUrl specifies an external link annotation
+	AnnotationExternalUrl = "docs.external.url"
+)
+
 // Options defines options for cli-docs-tool
 type Options struct {
 	Root      *cobra.Command
@@ -73,25 +78,6 @@ func (c *Client) GenAllTree() error {
 		return err
 	}
 	return nil
-}
-
-// DisableFlagsInUseLine sets the DisableFlagsInUseLine flag on all
-// commands within the tree rooted at cmd.
-func (c *Client) DisableFlagsInUseLine() {
-	visitAll(c.root, func(ccmd *cobra.Command) {
-		// do not add a `[flags]` to the end of the usage line.
-		ccmd.DisableFlagsInUseLine = true
-	})
-}
-
-// visitAll traverses all commands from the root.
-// This is different from the VisitAll of cobra.Command where only parents
-// are checked.
-func visitAll(root *cobra.Command, fn func(*cobra.Command)) {
-	for _, cmd := range root.Commands() {
-		visitAll(cmd, fn)
-	}
-	fn(root)
 }
 
 func fileExists(f string) bool {

@@ -97,6 +97,9 @@ func (c *Client) genYamlTreeCustom(cmd *cobra.Command, filePrepender func(string
 		}
 	}
 
+	// always disable the addition of [flags] to the usage
+	cmd.DisableFlagsInUseLine = true
+
 	// The "root" command used in the generator is just a "stub", and only has a
 	// list of subcommands, but not (e.g.) global options/flags. We should fix
 	// that, so that the YAML file for the docker "root" command contains the
@@ -139,6 +142,10 @@ func (c *Client) genYamlCustom(cmd *cobra.Command, w io.Writer) error {
 		// minus the with of the field, colon, and whitespace ('long: ').
 		longMaxWidth = 74
 	)
+
+	// necessary to add inherited flags otherwise some
+	// fields are not properly declared like usage
+	cmd.Flags().AddFlagSet(cmd.InheritedFlags())
 
 	cliDoc := cmdDoc{
 		Name:       cmd.CommandPath(),
@@ -259,7 +266,7 @@ func genFlagResult(flags *pflag.FlagSet, anchors map[string]struct{}) []cmdOptio
 			Deprecated:   len(flag.Deprecated) > 0,
 		}
 
-		if v, ok := flag.Annotations["docs.external.url"]; ok && len(v) > 0 {
+		if v, ok := flag.Annotations[AnnotationExternalUrl]; ok && len(v) > 0 {
 			opt.DetailsURL = strings.TrimPrefix(v[0], "https://docs.docker.com")
 		} else if _, ok = anchors[flag.Name]; ok {
 			opt.DetailsURL = "#" + flag.Name
