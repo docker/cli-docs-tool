@@ -37,6 +37,9 @@ func (c *Client) GenMarkdownTree(cmd *cobra.Command) error {
 		}
 	}
 
+	// always disable the addition of [flags] to the usage
+	cmd.DisableFlagsInUseLine = true
+
 	// Skip the root command altogether, to prevent generating a useless
 	// md file for plugins.
 	if c.plugin && !cmd.HasParent() {

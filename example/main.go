@@ -63,7 +63,6 @@ func gen(opts *options) error {
 	if err != nil {
 		return err
 	}
-	c.DisableFlagsInUseLine()
 
 	// generate all supported docs formats
 	return c.GenAllTree()

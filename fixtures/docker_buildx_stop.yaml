@@ -1,7 +1,7 @@
 command: docker buildx stop
 short: Stop builder instance
 long: Stop builder instance
-usage: docker buildx stop [NAME] [flags]
+usage: docker buildx stop [NAME]
 pname: docker buildx
 plink: docker_buildx.yaml
 inherited_options:

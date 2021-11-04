@@ -2,7 +2,7 @@ command: docker buildx build
 aliases: b
 short: Start a build
 long: Start a build
-usage: docker buildx build [OPTIONS] PATH | URL | - [flags]
+usage: docker buildx build [OPTIONS] PATH | URL | -
 pname: docker buildx
 plink: docker_buildx.yaml
 options:

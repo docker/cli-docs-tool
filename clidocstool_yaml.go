@@ -97,6 +97,9 @@ func (c *Client) genYamlTreeCustom(cmd *cobra.Command, filePrepender func(string
 		}
 	}
 
+	// always disable the addition of [flags] to the usage
+	cmd.DisableFlagsInUseLine = true
+
 	// The "root" command used in the generator is just a "stub", and only has a
 	// list of subcommands, but not (e.g.) global options/flags. We should fix
 	// that, so that the YAML file for the docker "root" command contains the
