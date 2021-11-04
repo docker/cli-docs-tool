@@ -15,10 +15,10 @@
 package clidocstool
 
 import (
+	"errors"
 	"io"
 	"os"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
