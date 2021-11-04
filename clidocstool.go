@@ -88,21 +88,17 @@ func fileExists(f string) bool {
 	return !info.IsDir()
 }
 
-func copyFile(src string, dest string) error {
-	srcFile, err := os.Open(src)
+func copyFile(src string, dst string) error {
+	sf, err := os.Open(src)
 	if err != nil {
 		return err
 	}
-	defer srcFile.Close()
-
-	destFile, err := os.Create(dest)
+	defer sf.Close()
+	df, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY, 0o600)
 	if err != nil {
 		return err
 	}
-	defer destFile.Close()
-
-	if _, err = io.Copy(destFile, srcFile); err != nil {
-		return err
-	}
-	return destFile.Sync()
+	defer df.Close()
+	_, err = io.Copy(df, sf)
+	return err
 }

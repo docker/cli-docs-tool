@@ -31,6 +31,9 @@ func TestGenMarkdownTree(t *testing.T) {
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpdir)
 
+	err = copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md"))
+	require.NoError(t, err)
+
 	c, err := New(Options{
 		Root:      buildxCmd,
 		SourceDir: tmpdir,
