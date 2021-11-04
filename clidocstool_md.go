@@ -24,7 +24,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -85,10 +84,10 @@ func (c *Client) GenMarkdownTree(cmd *cobra.Command) error {
 	end := strings.Index(cs, "<!---MARKER_GEN_END-->")
 
 	if start == -1 {
-		return errors.Errorf("no start marker in %s", mdFile)
+		return fmt.Errorf("no start marker in %s", mdFile)
 	}
 	if end == -1 {
-		return errors.Errorf("no end marker in %s", mdFile)
+		return fmt.Errorf("no end marker in %s", mdFile)
 	}
 
 	out, err := mdCmdOutput(cmd, cs)
@@ -102,7 +101,7 @@ func (c *Client) GenMarkdownTree(cmd *cobra.Command) error {
 		return err
 	}
 	if err = ioutil.WriteFile(targetPath, []byte(cont), fi.Mode()); err != nil {
-		return errors.Wrapf(err, "failed to write %s", targetPath)
+		return fmt.Errorf("failed to write %s: %w", targetPath, err)
 	}
 
 	return nil
