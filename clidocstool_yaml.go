@@ -140,6 +140,10 @@ func (c *Client) genYamlCustom(cmd *cobra.Command, w io.Writer) error {
 		longMaxWidth = 74
 	)
 
+	// necessary to add inherited flags otherwise some
+	// fields are not properly declared like usage
+	cmd.Flags().AddFlagSet(cmd.InheritedFlags())
+
 	cliDoc := cmdDoc{
 		Name:       cmd.CommandPath(),
 		Aliases:    strings.Join(cmd.Aliases, ", "),
@@ -259,7 +263,7 @@ func genFlagResult(flags *pflag.FlagSet, anchors map[string]struct{}) []cmdOptio
 			Deprecated:   len(flag.Deprecated) > 0,
 		}
 
-		if v, ok := flag.Annotations["docs.external.url"]; ok && len(v) > 0 {
+		if v, ok := flag.Annotations[AnnotationExternalUrl]; ok && len(v) > 0 {
 			opt.DetailsURL = strings.TrimPrefix(v[0], "https://docs.docker.com")
 		} else if _, ok = anchors[flag.Name]; ok {
 			opt.DetailsURL = "#" + flag.Name

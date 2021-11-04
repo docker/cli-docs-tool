@@ -39,7 +39,7 @@ func TestGenYamlTree(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, c.GenYamlTree(buildxCmd))
 
-	for _, tt := range []string{"docker_buildx.yaml", "docker_buildx_build.yaml"} {
+	for _, tt := range []string{"docker_buildx.yaml", "docker_buildx_build.yaml", "docker_buildx_stop.yaml"} {
 		tt := tt
 		t.Run(tt, func(t *testing.T) {
 			fres := filepath.Join(tmpdir, tt)

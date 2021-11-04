@@ -1,15 +1,10 @@
-command: docker buildx
-short: Build with BuildKit
-long: Build with BuildKit
-pname: docker
-plink: docker.yaml
-cname:
-- docker buildx build
-- docker buildx stop
-clink:
-- docker_buildx_build.yaml
-- docker_buildx_stop.yaml
-options:
+command: docker buildx stop
+short: Stop builder instance
+long: Stop builder instance
+usage: docker buildx stop [NAME] [flags]
+pname: docker buildx
+plink: docker_buildx.yaml
+inherited_options:
 - option: builder
   value_type: string
   description: Override the configured builder instance

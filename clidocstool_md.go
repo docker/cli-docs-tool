@@ -117,7 +117,7 @@ func mdFilename(cmd *cobra.Command) string {
 
 func mdMakeLink(txt, link string, f *pflag.Flag, isAnchor bool) string {
 	link = "#" + link
-	annotations, ok := f.Annotations["docs.external.url"]
+	annotations, ok := f.Annotations[AnnotationExternalUrl]
 	if ok && len(annotations) > 0 {
 		link = annotations[0]
 	} else {
@@ -158,11 +158,10 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 		fmt.Fprint(b, "\n\n")
 	}
 
-	hasFlags := cmd.Flags().HasAvailableFlags()
-
+	// add inherited flags before checking for flags availability
 	cmd.Flags().AddFlagSet(cmd.InheritedFlags())
 
-	if hasFlags {
+	if cmd.Flags().HasAvailableFlags() {
 		fmt.Fprint(b, "### Options\n\n")
 		fmt.Fprint(b, "| Name | Description |\n")
 		fmt.Fprint(b, "| --- | --- |\n")

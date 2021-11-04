@@ -39,7 +39,7 @@ func TestGenMarkdownTree(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, c.GenMarkdownTree(buildxCmd))
 
-	for _, tt := range []string{"buildx.md", "buildx_build.md"} {
+	for _, tt := range []string{"buildx.md", "buildx_build.md", "buildx_stop.md"} {
 		tt := tt
 		t.Run(tt, func(t *testing.T) {
 			fres := filepath.Join(tmpdir, tt)

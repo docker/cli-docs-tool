@@ -30,6 +30,7 @@ var (
 	dockerCmd      *cobra.Command
 	buildxCmd      *cobra.Command
 	buildxBuildCmd *cobra.Command
+	buildxStopCmd  *cobra.Command
 )
 
 //nolint:errcheck
@@ -54,43 +55,52 @@ func init() {
 		Short:   "Start a build",
 		Run:     func(cmd *cobra.Command, args []string) {},
 	}
+	buildxStopCmd = &cobra.Command{
+		Use:   "stop [NAME]",
+		Short: "Stop builder instance",
+		Run:   func(cmd *cobra.Command, args []string) {},
+	}
 
-	flags := buildxBuildCmd.Flags()
-	flags.Bool("push", false, "Shorthand for --output=type=registry")
-	flags.Bool("load", false, "Shorthand for --output=type=docker")
-	flags.StringArrayP("tag", "t", []string{}, "Name and optionally a tag in the 'name:tag' format")
-	flags.SetAnnotation("tag", "docs.external.url", []string{"https://docs.docker.com/engine/reference/commandline/build/#tag-an-image--t"})
-	flags.StringArray("build-arg", []string{}, "Set build-time variables")
-	flags.SetAnnotation("build-arg", "docs.external.url", []string{"https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg"})
-	flags.StringP("file", "f", "", "Name of the Dockerfile (Default is 'PATH/Dockerfile')")
-	flags.SetAnnotation("file", "docs.external.url", []string{"https://docs.docker.com/engine/reference/commandline/build/#specify-a-dockerfile--f"})
-	flags.StringArray("label", []string{}, "Set metadata for an image")
-	flags.StringArray("cache-from", []string{}, "External cache sources (eg. user/app:cache, type=local,src=path/to/dir)")
-	flags.StringArray("cache-to", []string{}, "Cache export destinations (eg. user/app:cache, type=local,dest=path/to/dir)")
-	flags.String("target", "", "Set the target build stage to build.")
-	flags.SetAnnotation("target", "docs.external.url", []string{"https://docs.docker.com/engine/reference/commandline/build/#specifying-target-build-stage---target"})
-	flags.StringSlice("allow", []string{}, "Allow extra privileged entitlement, e.g. network.host, security.insecure")
-	flags.StringArray("platform", []string{}, "Set target platform for build")
-	flags.StringArray("secret", []string{}, "Secret file to expose to the build: id=mysecret,src=/local/secret")
-	flags.StringArray("ssh", []string{}, "SSH agent socket or keys to expose to the build (format: `default|<id>[=<socket>|<key>[,<key>]]`)")
-	flags.StringArrayP("output", "o", []string{}, "Output destination (format: type=local,dest=path)")
+	buildxPFlags := buildxCmd.PersistentFlags()
+	buildxPFlags.String("builder", os.Getenv("BUILDX_BUILDER"), "Override the configured builder instance")
+
+	buildxBuildFlags := buildxBuildCmd.Flags()
+	buildxBuildFlags.Bool("push", false, "Shorthand for --output=type=registry")
+	buildxBuildFlags.Bool("load", false, "Shorthand for --output=type=docker")
+	buildxBuildFlags.StringArrayP("tag", "t", []string{}, "Name and optionally a tag in the 'name:tag' format")
+	buildxBuildFlags.SetAnnotation("tag", AnnotationExternalUrl, []string{"https://docs.docker.com/engine/reference/commandline/build/#tag-an-image--t"})
+	buildxBuildFlags.StringArray("build-arg", []string{}, "Set build-time variables")
+	buildxBuildFlags.SetAnnotation("build-arg", AnnotationExternalUrl, []string{"https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg"})
+	buildxBuildFlags.StringP("file", "f", "", "Name of the Dockerfile (Default is 'PATH/Dockerfile')")
+	buildxBuildFlags.SetAnnotation("file", AnnotationExternalUrl, []string{"https://docs.docker.com/engine/reference/commandline/build/#specify-a-dockerfile--f"})
+	buildxBuildFlags.StringArray("label", []string{}, "Set metadata for an image")
+	buildxBuildFlags.StringArray("cache-from", []string{}, "External cache sources (eg. user/app:cache, type=local,src=path/to/dir)")
+	buildxBuildFlags.StringArray("cache-to", []string{}, "Cache export destinations (eg. user/app:cache, type=local,dest=path/to/dir)")
+	buildxBuildFlags.String("target", "", "Set the target build stage to build.")
+	buildxBuildFlags.SetAnnotation("target", AnnotationExternalUrl, []string{"https://docs.docker.com/engine/reference/commandline/build/#specifying-target-build-stage---target"})
+	buildxBuildFlags.StringSlice("allow", []string{}, "Allow extra privileged entitlement, e.g. network.host, security.insecure")
+	buildxBuildFlags.StringArray("platform", []string{}, "Set target platform for build")
+	buildxBuildFlags.StringArray("secret", []string{}, "Secret file to expose to the build: id=mysecret,src=/local/secret")
+	buildxBuildFlags.StringArray("ssh", []string{}, "SSH agent socket or keys to expose to the build (format: `default|<id>[=<socket>|<key>[,<key>]]`)")
+	buildxBuildFlags.StringArrayP("output", "o", []string{}, "Output destination (format: type=local,dest=path)")
 	// not implemented
-	flags.String("network", "default", "Set the networking mode for the RUN instructions during build")
-	flags.StringSlice("add-host", []string{}, "Add a custom host-to-IP mapping (host:ip)")
-	flags.SetAnnotation("add-host", "docs.external.url", []string{"https://docs.docker.com/engine/reference/commandline/build/#add-entries-to-container-hosts-file---add-host"})
-	flags.String("iidfile", "", "Write the image ID to the file")
+	buildxBuildFlags.String("network", "default", "Set the networking mode for the RUN instructions during build")
+	buildxBuildFlags.StringSlice("add-host", []string{}, "Add a custom host-to-IP mapping (host:ip)")
+	buildxBuildFlags.SetAnnotation("add-host", AnnotationExternalUrl, []string{"https://docs.docker.com/engine/reference/commandline/build/#add-entries-to-container-hosts-file---add-host"})
+	buildxBuildFlags.String("iidfile", "", "Write the image ID to the file")
 	// hidden flags
-	flags.BoolP("quiet", "q", false, "Suppress the build output and print image ID on success")
-	flags.MarkHidden("quiet")
-	flags.Bool("squash", false, "Squash newly built layers into a single new layer")
-	flags.MarkHidden("squash")
-	flags.String("ulimit", "", "Ulimit options")
-	flags.MarkHidden("ulimit")
-	flags.StringSlice("security-opt", []string{}, "Security options")
-	flags.MarkHidden("security-opt")
-	flags.Bool("compress", false, "Compress the build context using gzip")
+	buildxBuildFlags.BoolP("quiet", "q", false, "Suppress the build output and print image ID on success")
+	buildxBuildFlags.MarkHidden("quiet")
+	buildxBuildFlags.Bool("squash", false, "Squash newly built layers into a single new layer")
+	buildxBuildFlags.MarkHidden("squash")
+	buildxBuildFlags.String("ulimit", "", "Ulimit options")
+	buildxBuildFlags.MarkHidden("ulimit")
+	buildxBuildFlags.StringSlice("security-opt", []string{}, "Security options")
+	buildxBuildFlags.MarkHidden("security-opt")
+	buildxBuildFlags.Bool("compress", false, "Compress the build context using gzip")
 
 	buildxCmd.AddCommand(buildxBuildCmd)
+	buildxCmd.AddCommand(buildxStopCmd)
 	dockerCmd.AddCommand(buildxCmd)
 }
 
@@ -108,7 +118,7 @@ func TestGenAllTree(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, c.GenAllTree())
 
-	for _, tt := range []string{"buildx.md", "buildx_build.md", "docker_buildx.yaml", "docker_buildx_build.yaml"} {
+	for _, tt := range []string{"buildx.md", "buildx_build.md", "buildx_stop.md", "docker_buildx.yaml", "docker_buildx_build.yaml", "docker_buildx_stop.yaml"} {
 		tt := tt
 		t.Run(tt, func(t *testing.T) {
 			fres := filepath.Join(tmpdir, tt)
