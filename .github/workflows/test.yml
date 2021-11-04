@@ -41,3 +41,20 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           file: ./coverage.txt
+
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      -
+        name: Run
+        run: |
+          go run main.go
+        working-directory: ./example

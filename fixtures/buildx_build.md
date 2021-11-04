@@ -1,6 +1,12 @@
-# do sub
+# docker buildx build
 
 <!---MARKER_GEN_START-->
+Start a build
+
+### Aliases
+
+`build`, `b`
+
 ### Options
 
 | Name | Description |
