@@ -37,6 +37,7 @@ type cmdOption struct {
 	Description     string `yaml:",omitempty"`
 	DetailsURL      string `yaml:"details_url,omitempty"` // DetailsURL contains an anchor-id or link for more information on this flag
 	Deprecated      bool
+	Hidden          bool
 	MinAPIVersion   string `yaml:"min_api_version,omitempty"`
 	Experimental    bool
 	ExperimentalCLI bool
@@ -264,6 +265,7 @@ func genFlagResult(flags *pflag.FlagSet, anchors map[string]struct{}) []cmdOptio
 			DefaultValue: forceMultiLine(flag.DefValue, defaultValueMaxWidth),
 			Description:  forceMultiLine(flag.Usage, descriptionMaxWidth),
 			Deprecated:   len(flag.Deprecated) > 0,
+			Hidden:       flag.Hidden,
 		}
 
 		if v, ok := flag.Annotations[AnnotationExternalUrl]; ok && len(v) > 0 {
