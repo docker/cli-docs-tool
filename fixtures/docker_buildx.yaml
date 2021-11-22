@@ -1,6 +1,6 @@
 command: docker buildx
-short: Build with BuildKit
-long: Build with BuildKit
+short: Docker Buildx
+long: Extended build capabilities with BuildKit
 pname: docker
 plink: docker.yaml
 cname:

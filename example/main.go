@@ -46,8 +46,8 @@ func gen(opts *options) error {
 
 	// root command
 	cmd := &cobra.Command{
-		Use:   "buildx",
-		Short: "Build with BuildKit",
+		Use:   "docker [OPTIONS] COMMAND [ARG...]",
+		Short: "The base command for the Docker CLI.",
 	}
 
 	// subcommand for the plugin
