@@ -9,7 +9,7 @@ options:
 - option: add-host
   value_type: stringSlice
   default_value: '[]'
-  description: Add a custom host-to-IP mapping (host:ip)
+  description: 'Add a custom host-to-IP mapping (format: `host:ip`)'
   details_url: /engine/reference/commandline/build/#add-entries-to-container-hosts-file---add-host
   deprecated: false
   hidden: false
@@ -21,7 +21,7 @@ options:
   value_type: stringSlice
   default_value: '[]'
   description: |
-    Allow extra privileged entitlement, e.g. network.host, security.insecure
+    Allow extra privileged entitlement (e.g., `network.host`, `security.insecure`)
   deprecated: false
   hidden: false
   experimental: false
@@ -43,7 +43,7 @@ options:
   value_type: stringArray
   default_value: '[]'
   description: |
-    External cache sources (eg. user/app:cache, type=local,src=path/to/dir)
+    External cache sources (e.g., `user/app:cache`, `type=local,src=path/to/dir`)
   deprecated: false
   hidden: false
   experimental: false
@@ -54,7 +54,17 @@ options:
   value_type: stringArray
   default_value: '[]'
   description: |
-    Cache export destinations (eg. user/app:cache, type=local,dest=path/to/dir)
+    Cache export destinations (e.g., `user/app:cache`, `type=local,dest=path/to/dir`)
+  deprecated: false
+  hidden: false
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: cgroup-parent
+  value_type: string
+  description: Optional parent cgroup for the container
+  details_url: /engine/reference/commandline/build/#use-a-custom-parent-cgroup---cgroup-parent
   deprecated: false
   hidden: false
   experimental: false
@@ -66,7 +76,56 @@ options:
   default_value: "false"
   description: Compress the build context using gzip
   deprecated: false
-  hidden: false
+  hidden: true
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: cpu-period
+  value_type: int64
+  default_value: "0"
+  description: Limit the CPU CFS (Completely Fair Scheduler) period
+  deprecated: false
+  hidden: true
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: cpu-quota
+  value_type: int64
+  default_value: "0"
+  description: Limit the CPU CFS (Completely Fair Scheduler) quota
+  deprecated: false
+  hidden: true
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: cpu-shares
+  shorthand: c
+  value_type: int64
+  default_value: "0"
+  description: CPU shares (relative weight)
+  deprecated: false
+  hidden: true
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: cpuset-cpus
+  value_type: string
+  description: CPUs in which to allow execution (`0-3`, `0,1`)
+  deprecated: false
+  hidden: true
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: cpuset-mems
+  value_type: string
+  description: MEMs in which to allow execution (`0-3`, `0,1`)
+  deprecated: false
+  hidden: true
   experimental: false
   experimentalcli: false
   kubernetes: false
@@ -74,10 +133,20 @@ options:
 - option: file
   shorthand: f
   value_type: string
-  description: Name of the Dockerfile (Default is 'PATH/Dockerfile')
+  description: 'Name of the Dockerfile (default: `PATH/Dockerfile`)'
   details_url: /engine/reference/commandline/build/#specify-a-dockerfile--f
   deprecated: false
   hidden: false
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: force-rm
+  value_type: bool
+  default_value: "false"
+  description: Always remove intermediate containers
+  deprecated: false
+  hidden: true
   experimental: false
   experimentalcli: false
   kubernetes: false
@@ -87,6 +156,15 @@ options:
   description: Write the image ID to the file
   deprecated: false
   hidden: false
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: isolation
+  value_type: string
+  description: Container isolation technology
+  deprecated: false
+  hidden: true
   experimental: false
   experimentalcli: false
   kubernetes: false
@@ -104,9 +182,29 @@ options:
 - option: load
   value_type: bool
   default_value: "false"
-  description: Shorthand for --output=type=docker
+  description: Shorthand for `--output=type=docker`
   deprecated: false
   hidden: false
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: memory
+  shorthand: m
+  value_type: string
+  description: Memory limit
+  deprecated: false
+  hidden: true
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: memory-swap
+  value_type: string
+  description: |
+    Swap limit equal to memory plus swap: `-1` to enable unlimited swap
+  deprecated: false
+  hidden: true
   experimental: false
   experimentalcli: false
   kubernetes: false
@@ -114,7 +212,7 @@ options:
 - option: network
   value_type: string
   default_value: default
-  description: Set the networking mode for the RUN instructions during build
+  description: Set the networking mode for the `RUN` instructions during build
   deprecated: false
   hidden: false
   experimental: false
@@ -125,7 +223,7 @@ options:
   shorthand: o
   value_type: stringArray
   default_value: '[]'
-  description: 'Output destination (format: type=local,dest=path)'
+  description: 'Output destination (format: `type=local,dest=path`)'
   deprecated: false
   hidden: false
   experimental: false
@@ -145,7 +243,7 @@ options:
 - option: push
   value_type: bool
   default_value: "false"
-  description: Shorthand for --output=type=registry
+  description: Shorthand for `--output=type=registry`
   deprecated: false
   hidden: false
   experimental: false
@@ -158,6 +256,16 @@ options:
   default_value: "false"
   description: Suppress the build output and print image ID on success
   deprecated: false
+  hidden: false
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: rm
+  value_type: bool
+  default_value: "true"
+  description: Remove intermediate containers after a successful build
+  deprecated: false
   hidden: true
   experimental: false
   experimentalcli: false
@@ -166,7 +274,8 @@ options:
 - option: secret
   value_type: stringArray
   default_value: '[]'
-  description: 'Secret file to expose to the build: id=mysecret,src=/local/secret'
+  description: |
+    Secret file to expose to the build (format: `id=mysecret,src=/local/secret`)
   deprecated: false
   hidden: false
   experimental: false
@@ -179,6 +288,15 @@ options:
   description: Security options
   deprecated: false
   hidden: true
+  experimental: false
+  experimentalcli: false
+  kubernetes: false
+  swarm: false
+- option: shm-size
+  value_type: string
+  description: Size of `/dev/shm`
+  deprecated: false
+  hidden: false
   experimental: false
   experimentalcli: false
   kubernetes: false
@@ -208,7 +326,7 @@ options:
   shorthand: t
   value_type: stringArray
   default_value: '[]'
-  description: Name and optionally a tag in the 'name:tag' format
+  description: 'Name and optionally a tag (format: `name:tag`)'
   details_url: /engine/reference/commandline/build/#tag-an-image--t
   deprecated: false
   hidden: false
@@ -230,7 +348,7 @@ options:
   value_type: string
   description: Ulimit options
   deprecated: false
-  hidden: true
+  hidden: false
   experimental: false
   experimentalcli: false
   kubernetes: false

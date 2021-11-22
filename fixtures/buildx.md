@@ -1,7 +1,7 @@
 # docker buildx
 
 <!---MARKER_GEN_START-->
-Build with BuildKit
+Extended build capabilities with BuildKit
 
 ### Subcommands
 
