@@ -367,7 +367,7 @@ func (c *Client) loadLongDescription(parentCmd *cobra.Command) error {
 			}
 		}
 		name := cmd.CommandPath()
-		if i := strings.Index(name, " "); c.plugin && i >= 0 {
+		if i := strings.Index(name, " "); i >= 0 {
 			// remove root command / binary name
 			name = name[i+1:]
 		}
