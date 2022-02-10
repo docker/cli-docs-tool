@@ -179,8 +179,8 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 
 	if cmd.Flags().HasAvailableFlags() {
 		fmt.Fprint(b, "### Options\n\n")
-		fmt.Fprint(b, "| Name | Description |\n")
-		fmt.Fprint(b, "| --- | --- |\n")
+		fmt.Fprint(b, "| Name | Type | Default | Description |\n")
+		fmt.Fprint(b, "| --- | --- | --- | --- |\n")
 
 		cmd.Flags().VisitAll(func(f *pflag.Flag) {
 			if f.Hidden {
@@ -193,19 +193,26 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 				name = mdMakeLink(name, f.Name, f, isLink)
 				fmt.Fprintf(b, "%s, ", name)
 			}
-			name := "`--" + f.Name
-			if f.Value.Type() != "bool" {
-				name += " " + f.Value.Type()
-			}
-			name += "`"
+			name := "`--" + f.Name + "`"
 			name = mdMakeLink(name, f.Name, f, isLink)
+
+			var ftype string
+			if f.Value.Type() != "bool" {
+				ftype = "`" + f.Value.Type() + "`"
+			}
+
+			var defval string
+			if f.DefValue != "" && (f.Value.Type() != "bool" && f.DefValue != "true") && f.DefValue != "[]" {
+				defval = "`" + f.DefValue + "`"
+			}
+
 			usage := f.Usage
 			if cd, ok := f.Annotations[annotation.CodeDelimiter]; ok {
 				usage = strings.ReplaceAll(usage, cd[0], "`")
 			} else if cd, ok := cmd.Annotations[annotation.CodeDelimiter]; ok {
 				usage = strings.ReplaceAll(usage, cd, "`")
 			}
-			fmt.Fprintf(b, "%s | %s |\n", mdEscapePipe(name), mdEscapePipe(usage))
+			fmt.Fprintf(b, "%s | %s | %s | %s |\n", mdEscapePipe(name), mdEscapePipe(ftype), mdEscapePipe(defval), mdEscapePipe(usage))
 		})
 		fmt.Fprintln(b, "")
 	}
