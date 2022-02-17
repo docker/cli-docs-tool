@@ -202,7 +202,14 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 			}
 
 			var defval string
-			if f.DefValue != "" && (f.Value.Type() != "bool" && f.DefValue != "true") && f.DefValue != "[]" {
+			if v, ok := f.Annotations[annotation.DefaultValue]; ok && len(v) > 0 {
+				defval = v[0]
+				if cd, ok := f.Annotations[annotation.CodeDelimiter]; ok {
+					defval = strings.ReplaceAll(defval, cd[0], "`")
+				} else if cd, ok := cmd.Annotations[annotation.CodeDelimiter]; ok {
+					defval = strings.ReplaceAll(defval, cd, "`")
+				}
+			} else if f.DefValue != "" && (f.Value.Type() != "bool" && f.DefValue != "true") && f.DefValue != "[]" {
 				defval = "`" + f.DefValue + "`"
 			}
 

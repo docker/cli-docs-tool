@@ -24,7 +24,7 @@ Start a build
 | `--load` |  |  | Shorthand for `--output=type=docker` |
 | `--network` | `string` | `default` | Set the networking mode for the `RUN` instructions during build |
 | `-o`, `--output` | `stringArray` |  | Output destination (format: `type=local,dest=path`) |
-| `--platform` | `stringArray` |  | Set target platform for build |
+| `--platform` | `stringArray` | local | Set target platform for build |
 | `--push` |  |  | Shorthand for `--output=type=registry` |
 | `-q`, `--quiet` |  |  | Suppress the build output and print image ID on success |
 | `--secret` | `stringArray` |  | Secret file to expose to the build (format: `id=mysecret,src=/local/secret`) |
