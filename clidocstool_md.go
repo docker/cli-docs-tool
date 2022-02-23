@@ -17,7 +17,6 @@ package clidocstool
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -82,14 +81,14 @@ func (c *Client) GenMarkdownTree(cmd *cobra.Command) error {
 		}); err != nil {
 			return err
 		}
-		if err = ioutil.WriteFile(targetPath, icBuf.Bytes(), 0644); err != nil {
+		if err = os.WriteFile(targetPath, icBuf.Bytes(), 0644); err != nil {
 			return err
 		}
 	} else if err := copyFile(sourcePath, targetPath); err != nil {
 		return err
 	}
 
-	content, err := ioutil.ReadFile(targetPath)
+	content, err := os.ReadFile(targetPath)
 	if err != nil {
 		return err
 	}
@@ -116,7 +115,7 @@ func (c *Client) GenMarkdownTree(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	if err = ioutil.WriteFile(targetPath, []byte(cont), fi.Mode()); err != nil {
+	if err = os.WriteFile(targetPath, []byte(cont), fi.Mode()); err != nil {
 		return fmt.Errorf("failed to write %s: %w", targetPath, err)
 	}
 

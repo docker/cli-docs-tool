@@ -15,7 +15,6 @@
 package clidocstool
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -27,9 +26,7 @@ import (
 
 //nolint:errcheck
 func TestGenYamlTree(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "test-gen-yaml-tree")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
 	c, err := New(Options{
 		Root:      buildxCmd,
@@ -42,12 +39,10 @@ func TestGenYamlTree(t *testing.T) {
 	for _, tt := range []string{"docker_buildx.yaml", "docker_buildx_build.yaml", "docker_buildx_stop.yaml"} {
 		tt := tt
 		t.Run(tt, func(t *testing.T) {
-			fres := filepath.Join(tmpdir, tt)
-			require.FileExists(t, fres)
-			bres, err := ioutil.ReadFile(fres)
+			bres, err := os.ReadFile(filepath.Join(tmpdir, tt))
 			require.NoError(t, err)
 
-			bexc, err := ioutil.ReadFile(path.Join("fixtures", tt))
+			bexc, err := os.ReadFile(path.Join("fixtures", tt))
 			require.NoError(t, err)
 			assert.Equal(t, string(bexc), string(bres))
 		})

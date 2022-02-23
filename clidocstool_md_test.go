@@ -15,7 +15,6 @@
 package clidocstool
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -27,11 +26,9 @@ import (
 
 //nolint:errcheck
 func TestGenMarkdownTree(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "test-gen-markdown-tree")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
-	err = copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md"))
+	err := copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md"))
 	require.NoError(t, err)
 
 	c, err := New(Options{
@@ -45,12 +42,10 @@ func TestGenMarkdownTree(t *testing.T) {
 	for _, tt := range []string{"buildx.md", "buildx_build.md", "buildx_stop.md"} {
 		tt := tt
 		t.Run(tt, func(t *testing.T) {
-			fres := filepath.Join(tmpdir, tt)
-			require.FileExists(t, fres)
-			bres, err := ioutil.ReadFile(fres)
+			bres, err := os.ReadFile(filepath.Join(tmpdir, tt))
 			require.NoError(t, err)
 
-			bexc, err := ioutil.ReadFile(path.Join("fixtures", tt))
+			bexc, err := os.ReadFile(path.Join("fixtures", tt))
 			require.NoError(t, err)
 			assert.Equal(t, string(bexc), string(bres))
 		})
