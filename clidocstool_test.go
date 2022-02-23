@@ -106,6 +106,7 @@ func init() {
 	buildxBuildFlags.StringArrayP("output", "o", []string{}, `Output destination (format: "type=local,dest=path")`)
 
 	buildxBuildFlags.StringArray("platform", []string{}, "Set target platform for build")
+	buildxBuildFlags.SetAnnotation("platform", annotation.DefaultValue, []string{"local"})
 
 	buildxBuildFlags.Bool("push", false, `Shorthand for "--output=type=registry"`)
 

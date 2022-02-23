@@ -269,12 +269,24 @@ func genFlagResult(cmd *cobra.Command, flags *pflag.FlagSet, anchors map[string]
 
 	flags.VisitAll(func(flag *pflag.Flag) {
 		opt = cmdOption{
-			Option:       flag.Name,
-			ValueType:    flag.Value.Type(),
-			DefaultValue: forceMultiLine(flag.DefValue, defaultValueMaxWidth),
-			Deprecated:   len(flag.Deprecated) > 0,
-			Hidden:       flag.Hidden,
+			Option:     flag.Name,
+			ValueType:  flag.Value.Type(),
+			Deprecated: len(flag.Deprecated) > 0,
+			Hidden:     flag.Hidden,
 		}
+
+		var defval string
+		if v, ok := flag.Annotations[annotation.DefaultValue]; ok && len(v) > 0 {
+			defval = v[0]
+			if cd, ok := flag.Annotations[annotation.CodeDelimiter]; ok {
+				defval = strings.ReplaceAll(defval, cd[0], "`")
+			} else if cd, ok := cmd.Annotations[annotation.CodeDelimiter]; ok {
+				defval = strings.ReplaceAll(defval, cd, "`")
+			}
+		} else {
+			defval = flag.DefValue
+		}
+		opt.DefaultValue = forceMultiLine(defval, defaultValueMaxWidth)
 
 		usage := flag.Usage
 		if cd, ok := flag.Annotations[annotation.CodeDelimiter]; ok {

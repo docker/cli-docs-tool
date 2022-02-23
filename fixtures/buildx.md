@@ -13,9 +13,9 @@ Extended build capabilities with BuildKit
 
 ### Options
 
-| Name | Description |
-| --- | --- |
-| `--builder string` | Override the configured builder instance |
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `--builder` | `string` |  | Override the configured builder instance |
 
 
 <!---MARKER_GEN_END-->

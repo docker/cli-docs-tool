@@ -232,7 +232,7 @@ options:
   swarm: false
 - option: platform
   value_type: stringArray
-  default_value: '[]'
+  default_value: local
   description: Set target platform for build
   deprecated: false
   hidden: false
