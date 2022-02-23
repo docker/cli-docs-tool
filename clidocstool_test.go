@@ -15,7 +15,6 @@
 package clidocstool
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -176,11 +175,9 @@ func init() {
 
 //nolint:errcheck
 func TestGenAllTree(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "test-gen-all-tree")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
-	err = copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md"))
+	err := copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md"))
 	require.NoError(t, err)
 
 	c, err := New(Options{
@@ -194,12 +191,10 @@ func TestGenAllTree(t *testing.T) {
 	for _, tt := range []string{"buildx.md", "buildx_build.md", "buildx_stop.md", "docker_buildx.yaml", "docker_buildx_build.yaml", "docker_buildx_stop.yaml"} {
 		tt := tt
 		t.Run(tt, func(t *testing.T) {
-			fres := filepath.Join(tmpdir, tt)
-			require.FileExists(t, fres)
-			bres, err := ioutil.ReadFile(fres)
+			bres, err := os.ReadFile(filepath.Join(tmpdir, tt))
 			require.NoError(t, err)
 
-			bexc, err := ioutil.ReadFile(path.Join("fixtures", tt))
+			bexc, err := os.ReadFile(path.Join("fixtures", tt))
 			require.NoError(t, err)
 			assert.Equal(t, string(bexc), string(bres))
 		})

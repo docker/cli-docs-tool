@@ -17,7 +17,6 @@ package clidocstool
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -388,7 +387,7 @@ func (c *Client) loadLongDescription(parentCmd *cobra.Command) error {
 		}
 		mdFile := strings.ReplaceAll(name, " ", "_") + ".md"
 		sourcePath := filepath.Join(c.source, mdFile)
-		content, err := ioutil.ReadFile(sourcePath)
+		content, err := os.ReadFile(sourcePath)
 		if os.IsNotExist(err) {
 			log.Printf("WARN: %s does not exist, skipping Markdown examples for YAML doc\n", mdFile)
 			continue
