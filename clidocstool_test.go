@@ -27,8 +27,6 @@ import (
 	"github.com/docker/cli-docs-tool/annotation"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -248,16 +246,16 @@ func TestGenAllTree(t *testing.T) {
 	setup()
 	tmpdir := t.TempDir()
 
-	// keep for testing
-	//tmpdir, err := os.MkdirTemp("", "cli-docs-tools")
-	//require.NoError(t, err)
-	//t.Log(tmpdir)
-
 	epoch, err := time.Parse("2006-Jan-02", "2020-Jan-10")
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Setenv("SOURCE_DATE_EPOCH", strconv.FormatInt(epoch.Unix(), 10))
 
-	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
+	err = copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	c, err := New(Options{
 		Root:      dockerCmd,
@@ -270,12 +268,17 @@ func TestGenAllTree(t *testing.T) {
 			Manual:  "Docker User Manuals",
 		},
 	})
-	require.NoError(t, err)
-	require.NoError(t, c.GenAllTree())
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = c.GenAllTree()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	seen := make(map[string]struct{})
 
-	_ = filepath.Walk("fixtures", func(path string, info fs.FileInfo, err error) error {
+	_ = filepath.Walk("fixtures", func(path string, info fs.FileInfo, _ error) error {
 		fname := filepath.Base(path)
 		// ignore dirs and .pre.md files
 		if info.IsDir() || strings.HasSuffix(fname, ".pre.md") {
@@ -283,14 +286,19 @@ func TestGenAllTree(t *testing.T) {
 		}
 		t.Run(fname, func(t *testing.T) {
 			seen[fname] = struct{}{}
-			require.NoError(t, err)
 
 			bres, err := os.ReadFile(filepath.Join(tmpdir, fname))
-			require.NoError(t, err)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			bexc, err := os.ReadFile(path)
-			require.NoError(t, err)
-			assert.Equal(t, string(bexc), string(bres))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(bexc) != string(bres) {
+				t.Fatalf("expected:\n%s\ngot:\n%s", string(bexc), string(bres))
+			}
 		})
 		return nil
 	})
