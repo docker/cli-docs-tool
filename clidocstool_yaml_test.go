@@ -19,9 +19,6 @@ import (
 	"path"
 	"path/filepath"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 //nolint:errcheck
@@ -33,18 +30,29 @@ func TestGenYamlTree(t *testing.T) {
 		SourceDir: tmpdir,
 		Plugin:    true,
 	})
-	require.NoError(t, err)
-	require.NoError(t, c.GenYamlTree(buildxCmd))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = c.GenYamlTree(buildxCmd)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for _, tt := range []string{"docker_buildx.yaml", "docker_buildx_build.yaml", "docker_buildx_stop.yaml"} {
 		tt := tt
 		t.Run(tt, func(t *testing.T) {
 			bres, err := os.ReadFile(filepath.Join(tmpdir, tt))
-			require.NoError(t, err)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			bexc, err := os.ReadFile(path.Join("fixtures", tt))
-			require.NoError(t, err)
-			assert.Equal(t, string(bexc), string(bres))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(bexc) != string(bres) {
+				t.Fatalf("expected:\n%s\ngot:\n%s", string(bexc), string(bres))
+			}
 		})
 	}
 }
