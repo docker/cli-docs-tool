@@ -15,7 +15,7 @@
 # limitations under the License.
 
 ARG GO_VERSION="1.18"
-ARG GOLANGCI_LINT_VERSION="v1.37"
+ARG GOLANGCI_LINT_VERSION="v1.45"
 ARG ADDLICENSE_VERSION="v1.0.0"
 
 ARG LICENSE_ARGS="-c cli-docs-tool -l apache"
@@ -55,7 +55,7 @@ FROM base AS lint
 RUN --mount=type=bind,target=. \
   --mount=type=cache,target=/root/.cache \
   --mount=from=golangci-lint,source=/usr/bin/golangci-lint,target=/usr/bin/golangci-lint \
-  golangci-lint run --timeout 10m0s ./...
+  golangci-lint run ./...
 
 FROM base AS license-set
 ARG LICENSE_ARGS
