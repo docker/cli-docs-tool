@@ -4,13 +4,10 @@ on:
   push:
     branches:
       - 'main'
-      - 'v*'
+      - 'releases/v*'
     tags:
       - 'v*'
   pull_request:
-    branches:
-      - 'main'
-      - 'v*'
 
 jobs:
   validate:
