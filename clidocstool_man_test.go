@@ -1,4 +1,4 @@
-// Copyright 2017 cli-docs-tool authors
+// Copyright 2021 cli-docs-tool authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,26 +18,41 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"testing"
+	"time"
 
+	"github.com/spf13/cobra/doc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 //nolint:errcheck
-func TestGenYamlTree(t *testing.T) {
+func TestGenManTree(t *testing.T) {
 	setup()
 	tmpdir := t.TempDir()
+
+	epoch, err := time.Parse("2006-Jan-02", "2020-Jan-10")
+	require.NoError(t, err)
+	t.Setenv("SOURCE_DATE_EPOCH", strconv.FormatInt(epoch.Unix(), 10))
+
+	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
 
 	c, err := New(Options{
 		Root:      buildxCmd,
 		SourceDir: tmpdir,
 		Plugin:    true,
+		ManHeader: &doc.GenManHeader{
+			Title:   "DOCKER",
+			Section: "1",
+			Source:  "Docker Community",
+			Manual:  "Docker User Manuals",
+		},
 	})
 	require.NoError(t, err)
-	require.NoError(t, c.GenYamlTree(buildxCmd))
+	require.NoError(t, c.GenManTree(buildxCmd))
 
-	for _, tt := range []string{"docker_buildx.yaml", "docker_buildx_build.yaml", "docker_buildx_stop.yaml"} {
+	for _, tt := range []string{"docker-buildx.1", "docker-buildx-build.1", "docker-buildx-stop.1"} {
 		tt := tt
 		t.Run(tt, func(t *testing.T) {
 			bres, err := os.ReadFile(filepath.Join(tmpdir, tt))
