@@ -3,6 +3,7 @@ module github.com/docker/cli-docs-tool/example
 go 1.16
 
 require (
+	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/docker/buildx v0.6.3
 	github.com/docker/cli v20.10.7+incompatible
 	github.com/docker/cli-docs-tool v0.0.0

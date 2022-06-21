@@ -26,10 +26,10 @@ import (
 
 //nolint:errcheck
 func TestGenMarkdownTree(t *testing.T) {
+	setup()
 	tmpdir := t.TempDir()
 
-	err := copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md"))
-	require.NoError(t, err)
+	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
 
 	c, err := New(Options{
 		Root:      buildxCmd,
