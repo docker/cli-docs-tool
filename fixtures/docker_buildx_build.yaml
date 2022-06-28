@@ -1,5 +1,5 @@
 command: docker buildx build
-aliases: docker buildx build, docker buildx b
+aliases: docker image build, docker buildx build, docker buildx b, docker build
 short: Start a build
 long: Start a build
 usage: docker buildx build [OPTIONS] PATH | URL | -

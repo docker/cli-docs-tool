@@ -58,6 +58,9 @@ func init() {
 		Aliases: []string{"b"},
 		Short:   "Start a build",
 		Run:     func(cmd *cobra.Command, args []string) {},
+		Annotations: map[string]string{
+			"aliases": "docker image build, docker buildx build, docker buildx b, docker build",
+		},
 	}
 	buildxStopCmd = &cobra.Command{
 		Use:   "stop [NAME]",
