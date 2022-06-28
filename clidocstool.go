@@ -97,3 +97,19 @@ func copyFile(src string, dst string) error {
 	_, err = io.Copy(df, sf)
 	return err
 }
+
+func getAliases(cmd *cobra.Command) []string {
+	if len(cmd.Aliases) == 0 {
+		return cmd.Aliases
+	}
+
+	var parentPath string
+	if cmd.HasParent() {
+		parentPath = cmd.Parent().CommandPath() + " "
+	}
+	aliases := []string{cmd.CommandPath()}
+	for _, a := range cmd.Aliases {
+		aliases = append(aliases, parentPath+a)
+	}
+	return aliases
+}
