@@ -23,6 +23,12 @@ import (
 	"github.com/docker/cli/cli/command"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
+	// import drivers otherwise factories are empty
+	// for --driver output flag usage
+	_ "github.com/docker/buildx/driver/docker"
+	_ "github.com/docker/buildx/driver/docker-container"
+	_ "github.com/docker/buildx/driver/kubernetes"
 )
 
 const (
