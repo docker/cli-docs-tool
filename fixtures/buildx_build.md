@@ -5,7 +5,7 @@ Start a build
 
 ### Aliases
 
-`docker buildx build`, `docker buildx b`
+`docker image build`, `docker buildx build`, `docker buildx b`, `docker build`
 
 ### Options
 
