@@ -29,7 +29,7 @@ Start a build
 | `-q`, `--quiet` |  |  | Suppress the build output and print image ID on success |
 | `--secret` | `stringArray` |  | Secret file to expose to the build (format: `id=mysecret,src=/local/secret`) |
 | `--shm-size` | `string` |  | Size of `/dev/shm` |
-| `--ssh` | `stringArray` |  | SSH agent socket or keys to expose to the build (format: `default\|<id>[=<socket>\|<key>[,<key>]]`) |
+| `--ssh` | `stringArray` |  | SSH agent socket or keys to expose to the build<br>format: `default\|<id>[=<socket>\|<key>[,<key>]]` |
 | [`-t`](https://docs.docker.com/engine/reference/commandline/build/#tag-an-image--t), [`--tag`](https://docs.docker.com/engine/reference/commandline/build/#tag-an-image--t) | `stringArray` |  | Name and optionally a tag (format: `name:tag`) |
 | [`--target`](https://docs.docker.com/engine/reference/commandline/build/#specifying-target-build-stage---target) | `string` |  | Set the target build stage to build. |
 | `--ulimit` | `string` |  | Ulimit options |

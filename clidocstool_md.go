@@ -20,12 +20,17 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"text/template"
 
 	"github.com/docker/cli-docs-tool/annotation"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+)
+
+var (
+	nlRegexp = regexp.MustCompile(`\r?\n`)
 )
 
 // GenMarkdownTree will generate a markdown page for this command and all
@@ -216,7 +221,7 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 			} else if cd, ok := cmd.Annotations[annotation.CodeDelimiter]; ok {
 				usage = strings.ReplaceAll(usage, cd, "`")
 			}
-			fmt.Fprintf(b, "%s | %s | %s | %s |\n", mdEscapePipe(name), mdEscapePipe(ftype), mdEscapePipe(defval), mdEscapePipe(usage))
+			fmt.Fprintf(b, "%s | %s | %s | %s |\n", mdEscapePipe(name), mdEscapePipe(ftype), mdEscapePipe(defval), mdReplaceNewline(mdEscapePipe(usage)))
 		})
 		fmt.Fprintln(b, "")
 	}
@@ -226,4 +231,8 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 
 func mdEscapePipe(s string) string {
 	return strings.ReplaceAll(s, `|`, `\|`)
+}
+
+func mdReplaceNewline(s string) string {
+	return nlRegexp.ReplaceAllString(s, "<br>")
 }
