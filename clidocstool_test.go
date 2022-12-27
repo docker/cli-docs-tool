@@ -118,7 +118,8 @@ func init() {
 
 	buildxBuildFlags.StringVar(&ignore, "shm-size", "", `Size of "/dev/shm"`)
 
-	buildxBuildFlags.StringArray("ssh", []string{}, `SSH agent socket or keys to expose to the build (format: "default|<id>[=<socket>|<key>[,<key>]]")`)
+	buildxBuildFlags.StringArray("ssh", []string{}, `SSH agent socket or keys to expose to the build
+format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 
 	buildxBuildFlags.StringArrayP("tag", "t", []string{}, `Name and optionally a tag (format: "name:tag")`)
 	buildxBuildFlags.SetAnnotation("tag", annotation.ExternalURL, []string{"https://docs.docker.com/engine/reference/commandline/build/#tag-an-image--t"})
