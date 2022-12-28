@@ -157,43 +157,43 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 		desc = cmd.Long
 	}
 	if desc != "" {
-		fmt.Fprintf(b, "%s\n\n", desc)
+		b.WriteString(desc + "\n\n")
 	}
 
 	if aliases := getAliases(cmd); len(aliases) != 0 {
-		fmt.Fprint(b, "### Aliases\n\n")
-		fmt.Fprint(b, "`"+strings.Join(aliases, "`, `")+"`")
-		fmt.Fprint(b, "\n\n")
+		b.WriteString("### Aliases\n\n")
+		b.WriteString("`" + strings.Join(aliases, "`, `") + "`")
+		b.WriteString("\n\n")
 	}
 
 	if len(cmd.Commands()) != 0 {
-		fmt.Fprint(b, "### Subcommands\n\n")
-		fmt.Fprint(b, "| Name | Description |\n")
-		fmt.Fprint(b, "| --- | --- |\n")
+		b.WriteString("### Subcommands\n\n")
+		b.WriteString("| Name | Description |\n")
+		b.WriteString("| --- | --- |\n")
 		for _, c := range cmd.Commands() {
-			fmt.Fprintf(b, "| [`%s`](%s) | %s |\n", c.Name(), mdFilename(c), c.Short)
+			b.WriteString(fmt.Sprintf("| [`%s`](%s) | %s |\n", c.Name(), mdFilename(c), c.Short))
 		}
-		fmt.Fprint(b, "\n\n")
+		b.WriteString("\n\n")
 	}
 
 	// add inherited flags before checking for flags availability
 	cmd.Flags().AddFlagSet(cmd.InheritedFlags())
 
 	if cmd.Flags().HasAvailableFlags() {
-		fmt.Fprint(b, "### Options\n\n")
-		fmt.Fprint(b, "| Name | Type | Default | Description |\n")
-		fmt.Fprint(b, "| --- | --- | --- | --- |\n")
+		b.WriteString("### Options\n\n")
+		b.WriteString("| Name | Type | Default | Description |\n")
+		b.WriteString("| --- | --- | --- | --- |\n")
 
 		cmd.Flags().VisitAll(func(f *pflag.Flag) {
 			if f.Hidden {
 				return
 			}
 			isLink := strings.Contains(old, "<a name=\""+f.Name+"\"></a>")
-			fmt.Fprint(b, "| ")
+			b.WriteString("| ")
 			if f.Shorthand != "" {
 				name := "`-" + f.Shorthand + "`"
 				name = mdMakeLink(name, f.Name, f, isLink)
-				fmt.Fprintf(b, "%s, ", name)
+				b.WriteString(name + ", ")
 			}
 			name := "`--" + f.Name + "`"
 			name = mdMakeLink(name, f.Name, f, isLink)
@@ -221,9 +221,9 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 			} else if cd, ok := cmd.Annotations[annotation.CodeDelimiter]; ok {
 				usage = strings.ReplaceAll(usage, cd, "`")
 			}
-			fmt.Fprintf(b, "%s | %s | %s | %s |\n", mdEscapePipe(name), mdEscapePipe(ftype), mdEscapePipe(defval), mdReplaceNewline(mdEscapePipe(usage)))
+			b.WriteString(fmt.Sprintf("%s | %s | %s | %s |\n", mdEscapePipe(name), mdEscapePipe(ftype), mdEscapePipe(defval), mdReplaceNewline(mdEscapePipe(usage))))
 		})
-		fmt.Fprintln(b, "")
+		b.WriteString("\n")
 	}
 
 	return b.String(), nil
