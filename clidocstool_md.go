@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"text/tabwriter"
 	"text/template"
 
 	"github.com/docker/cli-docs-tool/annotation"
@@ -30,7 +31,8 @@ import (
 )
 
 var (
-	nlRegexp = regexp.MustCompile(`\r?\n`)
+	nlRegexp  = regexp.MustCompile(`\r?\n`)
+	adjustSep = regexp.MustCompile(`\|:---(\s+)`)
 )
 
 // GenMarkdownTree will generate a markdown page for this command and all
@@ -149,6 +151,42 @@ func mdMakeLink(txt, link string, f *pflag.Flag, isAnchor bool) string {
 	return "[" + txt + "](" + link + ")"
 }
 
+type mdTable struct {
+	out       *strings.Builder
+	tabWriter *tabwriter.Writer
+}
+
+func newMdTable(headers ...string) *mdTable {
+	w := &strings.Builder{}
+	t := &mdTable{
+		out: w,
+		// Using tabwriter.Debug, which uses "|" as separator instead of tabs,
+		// which is what we want. It's a bit of a hack, but does the job :)
+		tabWriter: tabwriter.NewWriter(w, 5, 5, 1, ' ', tabwriter.Debug),
+	}
+	t.addHeader(headers...)
+	return t
+}
+
+func (t *mdTable) addHeader(cols ...string) {
+	t.AddRow(cols...)
+	_, _ = t.tabWriter.Write([]byte("|" + strings.Repeat(":---\t", len(cols)) + "\n"))
+}
+
+func (t *mdTable) AddRow(cols ...string) {
+	for i := range cols {
+		cols[i] = mdEscapePipe(cols[i])
+	}
+	_, _ = t.tabWriter.Write([]byte("| " + strings.Join(cols, "\t ") + "\t\n"))
+}
+
+func (t *mdTable) String() string {
+	_ = t.tabWriter.Flush()
+	return adjustSep.ReplaceAllStringFunc(t.out.String()+"\n", func(in string) string {
+		return strings.ReplaceAll(in, " ", "-")
+	})
+}
+
 func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 	b := &strings.Builder{}
 
@@ -168,12 +206,11 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 
 	if len(cmd.Commands()) != 0 {
 		b.WriteString("### Subcommands\n\n")
-		b.WriteString("| Name | Description |\n")
-		b.WriteString("| --- | --- |\n")
+		table := newMdTable("Name", "Description")
 		for _, c := range cmd.Commands() {
-			b.WriteString(fmt.Sprintf("| [`%s`](%s) | %s |\n", c.Name(), mdFilename(c), c.Short))
+			table.AddRow(fmt.Sprintf("[`%s`](%s)", c.Name(), mdFilename(c)), c.Short)
 		}
-		b.WriteString("\n\n")
+		b.WriteString(table.String() + "\n")
 	}
 
 	// add inherited flags before checking for flags availability
@@ -181,22 +218,18 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 
 	if cmd.Flags().HasAvailableFlags() {
 		b.WriteString("### Options\n\n")
-		b.WriteString("| Name | Type | Default | Description |\n")
-		b.WriteString("| --- | --- | --- | --- |\n")
-
+		table := newMdTable("Name", "Type", "Default", "Description")
 		cmd.Flags().VisitAll(func(f *pflag.Flag) {
 			if f.Hidden {
 				return
 			}
 			isLink := strings.Contains(old, "<a name=\""+f.Name+"\"></a>")
-			b.WriteString("| ")
+			var name string
 			if f.Shorthand != "" {
-				name := "`-" + f.Shorthand + "`"
-				name = mdMakeLink(name, f.Name, f, isLink)
-				b.WriteString(name + ", ")
+				name = mdMakeLink("`-"+f.Shorthand+"`", f.Name, f, isLink)
+				name += ", "
 			}
-			name := "`--" + f.Name + "`"
-			name = mdMakeLink(name, f.Name, f, isLink)
+			name += mdMakeLink("`--"+f.Name+"`", f.Name, f, isLink)
 
 			var ftype string
 			if f.Value.Type() != "bool" {
@@ -221,9 +254,9 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 			} else if cd, ok := cmd.Annotations[annotation.CodeDelimiter]; ok {
 				usage = strings.ReplaceAll(usage, cd, "`")
 			}
-			b.WriteString(fmt.Sprintf("%s | %s | %s | %s |\n", mdEscapePipe(name), mdEscapePipe(ftype), mdEscapePipe(defval), mdReplaceNewline(mdEscapePipe(usage))))
+			table.AddRow(name, ftype, defval, mdReplaceNewline(usage))
 		})
-		b.WriteString("\n")
+		b.WriteString(table.String())
 	}
 
 	return b.String(), nil
