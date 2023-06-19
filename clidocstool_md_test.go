@@ -38,6 +38,7 @@ func TestGenMarkdownTree(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NoError(t, c.GenMarkdownTree(buildxCmd))
+	require.NoFileExists(t, filepath.Join(tmpdir, "buildx__INTERNAL_SERVE.md"))
 
 	for _, tt := range []string{"buildx.md", "buildx_build.md", "buildx_stop.md"} {
 		tt := tt

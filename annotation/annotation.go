@@ -22,4 +22,7 @@ const (
 	CodeDelimiter = "docs.code-delimiter"
 	// DefaultValue specifies the default value for a flag.
 	DefaultValue = "docs.default-value"
+	// MardownNoGen specifies that the command or flag mparkdown docs should
+	// not be generated.
+	MardownNoGen = "docs.markdown-no-gen"
 )

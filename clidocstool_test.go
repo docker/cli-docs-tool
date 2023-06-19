@@ -31,6 +31,7 @@ var (
 	buildxCmd      *cobra.Command
 	buildxBuildCmd *cobra.Command
 	buildxStopCmd  *cobra.Command
+	buildxServeCmd *cobra.Command
 )
 
 //nolint:errcheck
@@ -66,6 +67,14 @@ func init() {
 		Use:   "stop [NAME]",
 		Short: "Stop builder instance",
 		Run:   func(cmd *cobra.Command, args []string) {},
+	}
+	buildxServeCmd = &cobra.Command{
+		Use:    "_INTERNAL_SERVE [OPTIONS]",
+		Hidden: true,
+		Run:    func(cmd *cobra.Command, args []string) {},
+		Annotations: map[string]string{
+			annotation.MardownNoGen: "",
+		},
 	}
 
 	buildxPFlags := buildxCmd.PersistentFlags()
@@ -174,6 +183,7 @@ format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 
 	buildxCmd.AddCommand(buildxBuildCmd)
 	buildxCmd.AddCommand(buildxStopCmd)
+	buildxCmd.AddCommand(buildxServeCmd)
 	dockerCmd.AddCommand(buildxCmd)
 }
 

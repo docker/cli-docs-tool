@@ -52,6 +52,9 @@ func (c *Client) GenMarkdownTree(cmd *cobra.Command) error {
 	if c.plugin && !cmd.HasParent() {
 		return nil
 	}
+	if _, ok := cmd.Annotations[annotation.MardownNoGen]; ok {
+		return nil
+	}
 
 	log.Printf("INFO: Generating Markdown for %q", cmd.CommandPath())
 	mdFile := mdFilename(cmd)
@@ -208,6 +211,9 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 		b.WriteString("### Subcommands\n\n")
 		table := newMdTable("Name", "Description")
 		for _, c := range cmd.Commands() {
+			if _, ok := c.Annotations[annotation.MardownNoGen]; ok {
+				continue
+			}
 			table.AddRow(fmt.Sprintf("[`%s`](%s)", c.Name(), mdFilename(c)), c.Short)
 		}
 		b.WriteString(table.String() + "\n")
@@ -221,6 +227,9 @@ func mdCmdOutput(cmd *cobra.Command, old string) (string, error) {
 		table := newMdTable("Name", "Type", "Default", "Description")
 		cmd.Flags().VisitAll(func(f *pflag.Flag) {
 			if f.Hidden {
+				return
+			}
+			if _, ok := f.Annotations[annotation.MardownNoGen]; ok {
 				return
 			}
 			isLink := strings.Contains(old, "<a name=\""+f.Name+"\"></a>")
