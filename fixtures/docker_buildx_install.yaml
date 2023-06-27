@@ -1,15 +1,10 @@
-command: docker buildx
-short: Docker Buildx
-long: Extended build capabilities with BuildKit
-pname: docker
-plink: docker.yaml
-cname:
-    - docker buildx build
-    - docker buildx stop
-clink:
-    - docker_buildx_build.yaml
-    - docker_buildx_stop.yaml
-options:
+command: docker buildx install
+short: Install buildx as a 'docker builder' alias
+long: Install buildx as a 'docker builder' alias
+usage: docker buildx install
+pname: docker buildx
+plink: docker_buildx.yaml
+inherited_options:
     - option: builder
       value_type: string
       description: Override the configured builder instance
@@ -20,7 +15,7 @@ options:
       kubernetes: false
       swarm: false
 deprecated: false
-hidden: false
+hidden: true
 experimental: false
 experimentalcli: false
 kubernetes: false
