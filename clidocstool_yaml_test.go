@@ -15,9 +15,10 @@
 package clidocstool
 
 import (
+	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,15 +37,39 @@ func TestGenYamlTree(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, c.GenYamlTree(buildxCmd))
 
-	for _, tt := range []string{"docker_buildx.yaml", "docker_buildx_build.yaml", "docker_buildx_install.yaml", "docker_buildx_stop.yaml"} {
-		tt := tt
-		t.Run(tt, func(t *testing.T) {
-			bres, err := os.ReadFile(filepath.Join(tmpdir, tt))
+	seen := make(map[string]struct{})
+
+	filepath.Walk("fixtures", func(path string, info fs.FileInfo, err error) error {
+		fname := filepath.Base(path)
+		// ignore dirs and any file that is not a .yaml file
+		if info.IsDir() || !strings.HasSuffix(fname, ".yaml") {
+			return nil
+		}
+		t.Run(fname, func(t *testing.T) {
+			seen[fname] = struct{}{}
 			require.NoError(t, err)
 
-			bexc, err := os.ReadFile(path.Join("fixtures", tt))
+			bres, err := os.ReadFile(filepath.Join(tmpdir, fname))
+			require.NoError(t, err)
+
+			bexc, err := os.ReadFile(path)
 			require.NoError(t, err)
 			assert.Equal(t, string(bexc), string(bres))
 		})
-	}
+		return nil
+	})
+
+	filepath.Walk(tmpdir, func(path string, info fs.FileInfo, err error) error {
+		fname := filepath.Base(path)
+		// ignore dirs and any file that is not a .yaml file
+		if info.IsDir() || !strings.HasSuffix(fname, ".yaml") {
+			return nil
+		}
+		t.Run("seen_"+fname, func(t *testing.T) {
+			if _, ok := seen[fname]; !ok {
+				t.Errorf("file %s not found in fixtures", fname)
+			}
+		})
+		return nil
+	})
 }

@@ -15,12 +15,13 @@
 package clidocstool
 
 import (
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,8 +29,7 @@ import (
 func TestGenMarkdownTree(t *testing.T) {
 	tmpdir := t.TempDir()
 
-	err := copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md"))
-	require.NoError(t, err)
+	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
 
 	c, err := New(Options{
 		Root:      buildxCmd,
@@ -39,15 +39,39 @@ func TestGenMarkdownTree(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, c.GenMarkdownTree(buildxCmd))
 
-	for _, tt := range []string{"buildx.md", "buildx_build.md", "buildx_stop.md"} {
-		tt := tt
-		t.Run(tt, func(t *testing.T) {
-			bres, err := os.ReadFile(filepath.Join(tmpdir, tt))
+	seen := make(map[string]struct{})
+
+	filepath.Walk("fixtures", func(path string, info fs.FileInfo, err error) error {
+		fname := filepath.Base(path)
+		// ignore dirs, .pre.md files and any file that is not a .md file
+		if info.IsDir() || !strings.HasSuffix(fname, ".md") || strings.HasSuffix(fname, ".pre.md") {
+			return nil
+		}
+		t.Run(fname, func(t *testing.T) {
+			seen[fname] = struct{}{}
 			require.NoError(t, err)
 
-			bexc, err := os.ReadFile(path.Join("fixtures", tt))
+			bres, err := os.ReadFile(filepath.Join(tmpdir, fname))
 			require.NoError(t, err)
-			assert.Equal(t, string(bexc), string(bres))
+
+			bexc, err := os.ReadFile(path)
+			require.NoError(t, err)
+			require.Equal(t, string(bexc), string(bres))
 		})
-	}
+		return nil
+	})
+
+	filepath.Walk(tmpdir, func(path string, info fs.FileInfo, err error) error {
+		fname := filepath.Base(path)
+		// ignore dirs, .pre.md files and any file that is not a .md file
+		if info.IsDir() || !strings.HasSuffix(fname, ".md") || strings.HasSuffix(fname, ".pre.md") {
+			return nil
+		}
+		t.Run("seen_"+fname, func(t *testing.T) {
+			if _, ok := seen[fname]; !ok {
+				t.Errorf("file %s not found in fixtures", fname)
+			}
+		})
+		return nil
+	})
 }
