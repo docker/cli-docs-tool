@@ -27,10 +27,11 @@ import (
 )
 
 var (
-	dockerCmd      *cobra.Command
-	buildxCmd      *cobra.Command
-	buildxBuildCmd *cobra.Command
-	buildxStopCmd  *cobra.Command
+	dockerCmd        *cobra.Command
+	buildxCmd        *cobra.Command
+	buildxBuildCmd   *cobra.Command
+	buildxInstallCmd *cobra.Command
+	buildxStopCmd    *cobra.Command
 )
 
 //nolint:errcheck
@@ -61,6 +62,13 @@ func init() {
 		Annotations: map[string]string{
 			"aliases": "docker image build, docker buildx build, docker buildx b, docker build",
 		},
+	}
+	buildxInstallCmd = &cobra.Command{
+		Use:    "install",
+		Short:  "Install buildx as a 'docker builder' alias",
+		Args:   cobra.ExactArgs(0),
+		Run:    func(cmd *cobra.Command, args []string) {},
+		Hidden: true,
 	}
 	buildxStopCmd = &cobra.Command{
 		Use:   "stop [NAME]",
@@ -173,6 +181,7 @@ format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 	buildxBuildFlags.MarkHidden("force-rm")
 
 	buildxCmd.AddCommand(buildxBuildCmd)
+	buildxCmd.AddCommand(buildxInstallCmd)
 	buildxCmd.AddCommand(buildxStopCmd)
 	dockerCmd.AddCommand(buildxCmd)
 }
@@ -192,7 +201,7 @@ func TestGenAllTree(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, c.GenAllTree())
 
-	for _, tt := range []string{"buildx.md", "buildx_build.md", "buildx_stop.md", "docker_buildx.yaml", "docker_buildx_build.yaml", "docker_buildx_stop.yaml"} {
+	for _, tt := range []string{"buildx.md", "buildx_build.md", "buildx_stop.md", "docker_buildx.yaml", "docker_buildx_build.yaml", "docker_buildx_install.yaml", "docker_buildx_stop.yaml"} {
 		tt := tt
 		t.Run(tt, func(t *testing.T) {
 			bres, err := os.ReadFile(filepath.Join(tmpdir, tt))
