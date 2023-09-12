@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Run
-        uses: docker/bake-action@v3
+        uses: docker/bake-action@v4
         with:
           targets: validate
 
@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Run
-        uses: docker/bake-action@v3
+        uses: docker/bake-action@v4
         with:
           targets: test
       -
