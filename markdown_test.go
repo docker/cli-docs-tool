@@ -96,50 +96,53 @@ Last line.`,
 	}
 }
 
-func TestConvertHTMLAnchor(t *testing.T) {
+func TestGetCustomAnchors(t *testing.T) {
 	tests := []struct {
 		in, id, expected string
 	}{
 		{
-			in:       `# <a name=heading1></a> Heading 1`,
-			id:       "heading1",
-			expected: `# Heading 1 {#heading1}`,
+			in: `# Heading 1 {#heading1}`,
+			id: "heading1",
 		},
 		{
-			in:       `## Heading 2<a name=heading2></a> `,
-			id:       "heading2",
-			expected: `## Heading 2 {#heading2}`,
+			in: `## Heading 2 {#heading2 }`,
+			id: "heading2",
 		},
 		{
-			in:       `### <a id=heading3></a>Heading 3`,
-			id:       "heading3",
-			expected: `### Heading 3 {#heading3}`,
+			in: `### Heading 3 { #heading3 }`,
+			id: "heading3",
 		},
 		{
-			in:       `#### <a id="heading4"></a> Heading 4`,
-			id:       "heading4",
-			expected: `#### Heading 4 {#heading4}`,
+			in: `#### Heading 4  {#heading4}`,
+			id: "heading4",
 		},
 		{
-			in:       `##### <a   id="heading5"  ></a>  Heading 5`,
-			id:       "heading5",
-			expected: `##### Heading 5 {#heading5}`,
+			in: `##### Heading 5 {id=heading5}`,
+			id: "heading5",
 		},
 		{
-			in:       `###### <a id=hello href=foo>hello!</a>Heading 6`,
-			id:       "",
-			expected: `###### <a id=hello href=foo>hello!</a>Heading 6`,
+			in: `###### Heading 6 {id="heading6"}`,
+			id: "heading6",
+		},
+		{
+			in: `## Heading 7 { id="heading7" }`,
+			id: "heading7",
+		},
+		{
+			in: `## Heading 8 {id="heading8" }`,
+			id: "heading8",
+		},
+		{
+			in: `## Heading 9 {id="heading9"}`,
+			id: "heading9",
 		},
 	}
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.in, func(t *testing.T) {
-			out, id := convertHTMLAnchor(tc.in)
+			id := getCustomAnchor(tc.in)
 			if id != tc.id {
 				t.Fatalf("expected: %s, actual:   %s\n", tc.id, id)
-			}
-			if out != tc.expected {
-				t.Fatalf("\nexpected: %s\nactual:   %s\n", tc.expected, out)
 			}
 		})
 	}

@@ -25,10 +25,10 @@ var (
 	// false positives for (e.g.) comments in code-blocks (# this is a comment),
 	// so should not be used as a generic regex for other purposes.
 	mdHeading = regexp.MustCompile(`^([#]{1,6})\s(.*)$`)
-	// htmlAnchor matches inline HTML anchors. This is intended to only match anchors
-	// for our use-case; DO NOT consider using this as a generic regex, or at least
-	// not before reading https://stackoverflow.com/a/1732454/1811501.
-	htmlAnchor = regexp.MustCompile(`<a\s+(?:name|id)="?([^"]+)"?\s*></a>\s*`)
+	// anchorRe matches inline custom anchors: {#heading-id}.
+	// This is intended to only match anchors for our use-case;
+	// DO NOT consider using this as a generic regex.
+	anchorRe = regexp.MustCompile(`\{\s*(?:#|id="?)(.*?)[\s\}\"]`)
 )
 
 // getSections returns all H2 sections by title (lowercase)
@@ -58,30 +58,21 @@ func cleanupMarkDown(mdString string) (md string, anchors []string) {
 	mdString = strings.ReplaceAll(mdString, "\t", "    ")
 	mdString = strings.ReplaceAll(mdString, "https://docs.docker.com", "")
 
-	var id string
 	// replace trailing whitespace per line, and handle custom anchors
 	lines := strings.Split(mdString, "\n")
 	for i := 0; i < len(lines); i++ {
 		lines[i] = strings.TrimRightFunc(lines[i], unicode.IsSpace)
-		lines[i], id = convertHTMLAnchor(lines[i])
-		if id != "" {
-			anchors = append(anchors, id)
-		}
+		anchors = append(anchors, getCustomAnchor(lines[i]))
 	}
 	return strings.Join(lines, "\n"), anchors
 }
 
-// convertHTMLAnchor converts inline anchor-tags in headings (<a name=myanchor></a>)
-// to an extended-markdown property ({#myanchor}). Extended Markdown properties
-// are not supported in GitHub Flavored Markdown, but are supported by Jekyll,
-// and lead to cleaner HTML in our docs, and prevents duplicate anchors.
-// It returns the converted MarkDown heading and the custom ID (if present)
-func convertHTMLAnchor(mdLine string) (md string, customID string) {
-	if m := mdHeading.FindStringSubmatch(mdLine); len(m) > 0 {
-		if a := htmlAnchor.FindStringSubmatch(m[2]); len(a) > 0 {
-			customID = a[1]
-			mdLine = m[1] + " " + htmlAnchor.ReplaceAllString(m[2], "") + " {#" + customID + "}"
+// getCustomAnchor returns the custom anchor IDs in headings ({#myanchor}).
+func getCustomAnchor(mdLine string) (customID string) {
+	if mdHeading.MatchString(mdLine) {
+		if m := anchorRe.FindStringSubmatch(mdLine); len(m) > 0 {
+			customID = m[1]
 		}
 	}
-	return mdLine, customID
+	return customID
 }
