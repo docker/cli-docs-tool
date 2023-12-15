@@ -61,7 +61,7 @@ jobs:
           tree -nh ./example/docs
       -
         name: Upload docs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: example-docs
           path: ./example/docs/*
