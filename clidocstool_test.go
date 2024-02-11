@@ -137,6 +137,8 @@ format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 
 	buildxBuildFlags.StringVar(&ignore, "ulimit", "", "Ulimit options")
 
+	buildxBuildFlags.BoolVar(&ignoreBool, "detach", true, "Dummy flag that tests boolean flags with true as default")
+
 	// hidden flags
 	buildxBuildFlags.BoolVar(&ignoreBool, "compress", false, "Compress the build context using gzip")
 	buildxBuildFlags.MarkHidden("compress")
