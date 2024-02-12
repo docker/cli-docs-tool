@@ -130,6 +130,16 @@ options:
       experimentalcli: false
       kubernetes: false
       swarm: false
+    - option: detach
+      value_type: bool
+      default_value: "true"
+      description: Dummy flag that tests boolean flags with true as default
+      deprecated: false
+      hidden: false
+      experimental: false
+      experimentalcli: false
+      kubernetes: false
+      swarm: false
     - option: file
       shorthand: f
       value_type: string
