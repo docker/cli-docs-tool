@@ -17,7 +17,9 @@ package clidocstool
 import (
 	"errors"
 	"io"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -72,6 +74,40 @@ func (c *Client) GenAllTree() error {
 	}
 	if err = c.GenYamlTree(c.root); err != nil {
 		return err
+	}
+	return nil
+}
+
+// GenAllTreeAndRemoveOldFiles creates all structured ref files for this command and
+// all descendants in the directory given then removes potential old documentation files from the origin directory tree.
+func (c *Client) GenAllTreeAndRemoveOldFiles() error {
+	if err := c.GenAllTree(); err != nil {
+		return err
+	}
+	filesToRemove := make(map[string]any)
+	filepath.WalkDir(c.source, func(path string, entry fs.DirEntry, err error) error {
+		return c.checkIfShouldBeRemoved(filesToRemove, path, entry, err)
+	})
+	for file := range filesToRemove {
+		if err := os.Remove(file); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Client) checkIfShouldBeRemoved(filesToRemove map[string]any, path string, entry fs.DirEntry, err error) error {
+	if err != nil {
+		return err
+	}
+	if !entry.IsDir() {
+		if _, err := entry.Info(); err != nil {
+			return err
+		}
+		targetFile := filepath.Join(c.target, strings.ReplaceAll(path, c.source, ""))
+		if _, err := os.Stat(targetFile); os.IsNotExist(err) {
+			filesToRemove[path] = struct{}{}
+		}
 	}
 	return nil
 }
