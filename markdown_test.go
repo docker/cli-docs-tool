@@ -84,6 +84,21 @@ This is a line.
 
 Last line.`,
 		},
+		{
+			doc: "Link preprocessing",
+			in: `[link1](https://example.com/)
+[link2](https://docs.docker.com/foo/bar/)
+[link3](buildx_build.md)
+[link4](buildx_imagetools_create.md)
+[link5](buildx_build.md#build-arg)
+[link6](./swarm_join-token.md)`,
+			expected: `[link1](https://example.com/)
+[link2](/foo/bar/)
+[link3](/reference/cli/docker/buildx/build/)
+[link4](/reference/cli/docker/buildx/imagetools/create/)
+[link5](/reference/cli/docker/buildx/build/#build-arg)
+[link6](/reference/cli/docker/swarm/join-token/)`,
+		},
 	}
 	for _, tc := range tests {
 		tc := tc
