@@ -33,12 +33,12 @@ func TestGenMarkdownTree(t *testing.T) {
 	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
 
 	c, err := New(Options{
-		Root:      buildxCmd,
+		Root:      dockerCmd,
 		SourceDir: tmpdir,
 		Plugin:    true,
 	})
 	require.NoError(t, err)
-	require.NoError(t, c.GenMarkdownTree(buildxCmd))
+	require.NoError(t, c.GenMarkdownTree(dockerCmd))
 
 	seen := make(map[string]struct{})
 

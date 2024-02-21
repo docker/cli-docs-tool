@@ -41,7 +41,7 @@ func TestGenManTree(t *testing.T) {
 	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
 
 	c, err := New(Options{
-		Root:      buildxCmd,
+		Root:      dockerCmd,
 		SourceDir: tmpdir,
 		Plugin:    true,
 		ManHeader: &doc.GenManHeader{
@@ -52,7 +52,7 @@ func TestGenManTree(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	require.NoError(t, c.GenManTree(buildxCmd))
+	require.NoError(t, c.GenManTree(dockerCmd))
 
 	seen := make(map[string]struct{})
 	remanpage := regexp.MustCompile(`\.\d+$`)

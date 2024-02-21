@@ -32,11 +32,13 @@ import (
 )
 
 var (
-	dockerCmd        *cobra.Command
-	buildxCmd        *cobra.Command
-	buildxBuildCmd   *cobra.Command
-	buildxInstallCmd *cobra.Command
-	buildxStopCmd    *cobra.Command
+	dockerCmd          *cobra.Command
+	attachCmd          *cobra.Command
+	buildxCmd          *cobra.Command
+	buildxBuildCmd     *cobra.Command
+	buildxDialStdioCmd *cobra.Command
+	buildxInstallCmd   *cobra.Command
+	buildxStopCmd      *cobra.Command
 )
 
 //nolint:errcheck
@@ -51,6 +53,22 @@ func setup() {
 		Version:               "20.10.8",
 		DisableFlagsInUseLine: true,
 	}
+
+	attachCmd = &cobra.Command{
+		Use:   "attach [OPTIONS] CONTAINER",
+		Short: "Attach local standard input, output, and error streams to a running container",
+		Annotations: map[string]string{
+			"aliases": "docker container attach, docker attach",
+		},
+		Run: func(cmd *cobra.Command, args []string) {},
+	}
+
+	attachFlags := attachCmd.Flags()
+	attachFlags.Bool("no-stdin", false, "Do not attach STDIN")
+	attachFlags.Bool("sig-proxy", true, "Proxy all received signals to the process")
+	attachFlags.String("detach-keys", "", "Override the key sequence for detaching a container")
+	dockerCmd.AddCommand(attachCmd)
+
 	buildxCmd = &cobra.Command{
 		Use:   "buildx",
 		Short: "Docker Buildx",
@@ -67,6 +85,12 @@ func setup() {
 		Annotations: map[string]string{
 			"aliases": "docker image build, docker buildx build, docker buildx b, docker build",
 		},
+	}
+	buildxDialStdioCmd = &cobra.Command{
+		Use:   "dial-stdio",
+		Short: "Proxy current stdio streams to builder instance",
+		Args:  cobra.NoArgs,
+		Run:   func(cmd *cobra.Command, args []string) {},
 	}
 	buildxInstallCmd = &cobra.Command{
 		Use:    "install",
@@ -187,7 +211,13 @@ format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 	buildxBuildFlags.BoolVar(&ignoreBool, "force-rm", false, "Always remove intermediate containers")
 	buildxBuildFlags.MarkHidden("force-rm")
 
+	buildxDialStdioFlags := buildxDialStdioCmd.Flags()
+
+	buildxDialStdioFlags.String("platform", os.Getenv("DOCKER_DEFAULT_PLATFORM"), "Target platform: this is used for node selection")
+	buildxDialStdioFlags.String("progress", "quiet", "Set type of progress output (auto, plain, tty).")
+
 	buildxCmd.AddCommand(buildxBuildCmd)
+	buildxCmd.AddCommand(buildxDialStdioCmd)
 	buildxCmd.AddCommand(buildxInstallCmd)
 	buildxCmd.AddCommand(buildxStopCmd)
 	dockerCmd.AddCommand(buildxCmd)
@@ -205,7 +235,7 @@ func TestGenAllTree(t *testing.T) {
 	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
 
 	c, err := New(Options{
-		Root:      buildxCmd,
+		Root:      dockerCmd,
 		SourceDir: tmpdir,
 		Plugin:    true,
 		ManHeader: &doc.GenManHeader{

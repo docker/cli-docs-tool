@@ -1,0 +1,43 @@
+command: docker buildx dial-stdio
+short: Proxy current stdio streams to builder instance
+long: Proxy current stdio streams to builder instance
+usage: docker buildx dial-stdio
+pname: docker buildx
+plink: docker_buildx.yaml
+options:
+    - option: platform
+      value_type: string
+      description: 'Target platform: this is used for node selection'
+      deprecated: false
+      hidden: false
+      experimental: false
+      experimentalcli: false
+      kubernetes: false
+      swarm: false
+    - option: progress
+      value_type: string
+      default_value: quiet
+      description: Set type of progress output (auto, plain, tty).
+      deprecated: false
+      hidden: false
+      experimental: false
+      experimentalcli: false
+      kubernetes: false
+      swarm: false
+inherited_options:
+    - option: builder
+      value_type: string
+      description: Override the configured builder instance
+      deprecated: false
+      hidden: false
+      experimental: false
+      experimentalcli: false
+      kubernetes: false
+      swarm: false
+deprecated: false
+hidden: false
+experimental: false
+experimentalcli: false
+kubernetes: false
+swarm: false
+
