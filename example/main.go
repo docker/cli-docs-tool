@@ -22,6 +22,7 @@ import (
 	clidocstool "github.com/docker/cli-docs-tool"
 	"github.com/docker/cli/cli/command"
 	"github.com/spf13/cobra"
+	"github.com/spf13/cobra/doc"
 	"github.com/spf13/pflag"
 
 	// import drivers otherwise factories are empty
@@ -66,6 +67,12 @@ func gen(opts *options) error {
 		SourceDir: opts.source,
 		TargetDir: opts.target,
 		Plugin:    true,
+		ManHeader: &doc.GenManHeader{
+			Title:   "BUILDX",
+			Section: "1",
+			Source:  "Docker Community",
+			Manual:  "Docker User Manuals",
+		},
 	})
 	if err != nil {
 		return err

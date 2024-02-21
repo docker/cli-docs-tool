@@ -19,11 +19,14 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/docker/cli-docs-tool/annotation"
 	"github.com/spf13/cobra"
+	"github.com/spf13/cobra/doc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -37,7 +40,7 @@ var (
 )
 
 //nolint:errcheck
-func init() {
+func setup() {
 	dockerCmd = &cobra.Command{
 		Use:                   "docker [OPTIONS] COMMAND [ARG...]",
 		Short:                 "A self-sufficient runtime for containers",
@@ -192,7 +195,12 @@ format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 
 //nolint:errcheck
 func TestGenAllTree(t *testing.T) {
+	setup()
 	tmpdir := t.TempDir()
+
+	epoch, err := time.Parse("2006-Jan-02", "2020-Jan-10")
+	require.NoError(t, err)
+	t.Setenv("SOURCE_DATE_EPOCH", strconv.FormatInt(epoch.Unix(), 10))
 
 	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
 
@@ -200,6 +208,12 @@ func TestGenAllTree(t *testing.T) {
 		Root:      buildxCmd,
 		SourceDir: tmpdir,
 		Plugin:    true,
+		ManHeader: &doc.GenManHeader{
+			Title:   "DOCKER",
+			Section: "1",
+			Source:  "Docker Community",
+			Manual:  "Docker User Manuals",
+		},
 	})
 	require.NoError(t, err)
 	require.NoError(t, c.GenAllTree())
