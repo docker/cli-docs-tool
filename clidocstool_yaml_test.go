@@ -27,15 +27,16 @@ import (
 
 //nolint:errcheck
 func TestGenYamlTree(t *testing.T) {
+	setup()
 	tmpdir := t.TempDir()
 
 	c, err := New(Options{
-		Root:      buildxCmd,
+		Root:      dockerCmd,
 		SourceDir: tmpdir,
 		Plugin:    true,
 	})
 	require.NoError(t, err)
-	require.NoError(t, c.GenYamlTree(buildxCmd))
+	require.NoError(t, c.GenYamlTree(dockerCmd))
 
 	seen := make(map[string]struct{})
 

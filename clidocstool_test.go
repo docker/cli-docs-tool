@@ -19,25 +19,30 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/docker/cli-docs-tool/annotation"
 	"github.com/spf13/cobra"
+	"github.com/spf13/cobra/doc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 var (
-	dockerCmd        *cobra.Command
-	buildxCmd        *cobra.Command
-	buildxBuildCmd   *cobra.Command
-	buildxInstallCmd *cobra.Command
-	buildxStopCmd    *cobra.Command
+	dockerCmd          *cobra.Command
+	attachCmd          *cobra.Command
+	buildxCmd          *cobra.Command
+	buildxBuildCmd     *cobra.Command
+	buildxDialStdioCmd *cobra.Command
+	buildxInstallCmd   *cobra.Command
+	buildxStopCmd      *cobra.Command
 )
 
 //nolint:errcheck
-func init() {
+func setup() {
 	dockerCmd = &cobra.Command{
 		Use:                   "docker [OPTIONS] COMMAND [ARG...]",
 		Short:                 "A self-sufficient runtime for containers",
@@ -48,6 +53,22 @@ func init() {
 		Version:               "20.10.8",
 		DisableFlagsInUseLine: true,
 	}
+
+	attachCmd = &cobra.Command{
+		Use:   "attach [OPTIONS] CONTAINER",
+		Short: "Attach local standard input, output, and error streams to a running container",
+		Annotations: map[string]string{
+			"aliases": "docker container attach, docker attach",
+		},
+		Run: func(cmd *cobra.Command, args []string) {},
+	}
+
+	attachFlags := attachCmd.Flags()
+	attachFlags.Bool("no-stdin", false, "Do not attach STDIN")
+	attachFlags.Bool("sig-proxy", true, "Proxy all received signals to the process")
+	attachFlags.String("detach-keys", "", "Override the key sequence for detaching a container")
+	dockerCmd.AddCommand(attachCmd)
+
 	buildxCmd = &cobra.Command{
 		Use:   "buildx",
 		Short: "Docker Buildx",
@@ -64,6 +85,12 @@ func init() {
 		Annotations: map[string]string{
 			"aliases": "docker image build, docker buildx build, docker buildx b, docker build",
 		},
+	}
+	buildxDialStdioCmd = &cobra.Command{
+		Use:   "dial-stdio",
+		Short: "Proxy current stdio streams to builder instance",
+		Args:  cobra.NoArgs,
+		Run:   func(cmd *cobra.Command, args []string) {},
 	}
 	buildxInstallCmd = &cobra.Command{
 		Use:    "install",
@@ -184,7 +211,13 @@ format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 	buildxBuildFlags.BoolVar(&ignoreBool, "force-rm", false, "Always remove intermediate containers")
 	buildxBuildFlags.MarkHidden("force-rm")
 
+	buildxDialStdioFlags := buildxDialStdioCmd.Flags()
+
+	buildxDialStdioFlags.String("platform", os.Getenv("DOCKER_DEFAULT_PLATFORM"), "Target platform: this is used for node selection")
+	buildxDialStdioFlags.String("progress", "quiet", "Set type of progress output (auto, plain, tty).")
+
 	buildxCmd.AddCommand(buildxBuildCmd)
+	buildxCmd.AddCommand(buildxDialStdioCmd)
 	buildxCmd.AddCommand(buildxInstallCmd)
 	buildxCmd.AddCommand(buildxStopCmd)
 	dockerCmd.AddCommand(buildxCmd)
@@ -192,14 +225,25 @@ format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 
 //nolint:errcheck
 func TestGenAllTree(t *testing.T) {
+	setup()
 	tmpdir := t.TempDir()
+
+	epoch, err := time.Parse("2006-Jan-02", "2020-Jan-10")
+	require.NoError(t, err)
+	t.Setenv("SOURCE_DATE_EPOCH", strconv.FormatInt(epoch.Unix(), 10))
 
 	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
 
 	c, err := New(Options{
-		Root:      buildxCmd,
+		Root:      dockerCmd,
 		SourceDir: tmpdir,
 		Plugin:    true,
+		ManHeader: &doc.GenManHeader{
+			Title:   "DOCKER",
+			Section: "1",
+			Source:  "Docker Community",
+			Manual:  "Docker User Manuals",
+		},
 	})
 	require.NoError(t, err)
 	require.NoError(t, c.GenAllTree())

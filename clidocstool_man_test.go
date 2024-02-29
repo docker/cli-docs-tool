@@ -1,4 +1,4 @@
-// Copyright 2021 cli-docs-tool authors
+// Copyright 2024 cli-docs-tool authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,16 +19,24 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
+	"regexp"
+	"strconv"
 	"testing"
+	"time"
 
+	"github.com/spf13/cobra/doc"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 //nolint:errcheck
-func TestGenMarkdownTree(t *testing.T) {
+func TestGenManTree(t *testing.T) {
 	setup()
 	tmpdir := t.TempDir()
+
+	epoch, err := time.Parse("2006-Jan-02", "2020-Jan-10")
+	require.NoError(t, err)
+	t.Setenv("SOURCE_DATE_EPOCH", strconv.FormatInt(epoch.Unix(), 10))
 
 	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
 
@@ -36,16 +44,23 @@ func TestGenMarkdownTree(t *testing.T) {
 		Root:      dockerCmd,
 		SourceDir: tmpdir,
 		Plugin:    true,
+		ManHeader: &doc.GenManHeader{
+			Title:   "DOCKER",
+			Section: "1",
+			Source:  "Docker Community",
+			Manual:  "Docker User Manuals",
+		},
 	})
 	require.NoError(t, err)
-	require.NoError(t, c.GenMarkdownTree(dockerCmd))
+	require.NoError(t, c.GenManTree(dockerCmd))
 
 	seen := make(map[string]struct{})
+	remanpage := regexp.MustCompile(`\.\d+$`)
 
 	filepath.Walk("fixtures", func(path string, info fs.FileInfo, err error) error {
 		fname := filepath.Base(path)
-		// ignore dirs, .pre.md files and any file that is not a .md file
-		if info.IsDir() || !strings.HasSuffix(fname, ".md") || strings.HasSuffix(fname, ".pre.md") {
+		// ignore dirs and any file that is not a manpage
+		if info.IsDir() || !remanpage.MatchString(fname) {
 			return nil
 		}
 		t.Run(fname, func(t *testing.T) {
@@ -57,15 +72,15 @@ func TestGenMarkdownTree(t *testing.T) {
 
 			bexc, err := os.ReadFile(path)
 			require.NoError(t, err)
-			require.Equal(t, string(bexc), string(bres))
+			assert.Equal(t, string(bexc), string(bres))
 		})
 		return nil
 	})
 
 	filepath.Walk(tmpdir, func(path string, info fs.FileInfo, err error) error {
 		fname := filepath.Base(path)
-		// ignore dirs, .pre.md files and any file that is not a .md file
-		if info.IsDir() || !strings.HasSuffix(fname, ".md") || strings.HasSuffix(fname, ".pre.md") {
+		// ignore dirs and any file that is not a manpage
+		if info.IsDir() || !remanpage.MatchString(fname) {
 			return nil
 		}
 		t.Run("seen_"+fname, func(t *testing.T) {
