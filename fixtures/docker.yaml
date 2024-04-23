@@ -1,0 +1,17 @@
+command: docker
+short: A self-sufficient runtime for containers
+long: A self-sufficient runtime for containers
+usage: docker [OPTIONS] COMMAND [ARG...]
+cname:
+    - docker attach
+    - docker buildx
+clink:
+    - docker_attach.yaml
+    - docker_buildx.yaml
+deprecated: false
+hidden: false
+experimental: false
+experimentalcli: false
+kubernetes: false
+swarm: false
+

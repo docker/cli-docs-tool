@@ -237,7 +237,7 @@ func TestGenAllTree(t *testing.T) {
 	c, err := New(Options{
 		Root:      dockerCmd,
 		SourceDir: tmpdir,
-		Plugin:    true,
+		Plugin:    false,
 		ManHeader: &doc.GenManHeader{
 			Title:   "DOCKER",
 			Section: "1",
