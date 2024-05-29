@@ -8,6 +8,28 @@ cname:
 clink:
     - docker_attach.yaml
     - docker_buildx.yaml
+options:
+    - option: help
+      value_type: bool
+      default_value: "false"
+      description: Print usage
+      deprecated: false
+      hidden: true
+      experimental: false
+      experimentalcli: false
+      kubernetes: false
+      swarm: false
+    - option: host
+      shorthand: H
+      value_type: string
+      default_value: unix:///var/run/docker.sock
+      description: Daemon socket to connect to
+      deprecated: false
+      hidden: false
+      experimental: false
+      experimentalcli: false
+      kubernetes: false
+      swarm: false
 deprecated: false
 hidden: false
 experimental: false

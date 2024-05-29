@@ -11,6 +11,12 @@ A self-sufficient runtime for containers
 | [`buildx`](buildx.md) | Docker Buildx                                                                 |
 
 
+### Options
+
+| Name           | Type     | Default                       | Description                 |
+|:---------------|:---------|:------------------------------|:----------------------------|
+| `-H`, `--host` | `string` | `unix:///var/run/docker.sock` | Daemon socket to connect to |
+
 
 <!---MARKER_GEN_END-->
 

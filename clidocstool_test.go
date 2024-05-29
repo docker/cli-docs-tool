@@ -54,6 +54,11 @@ func setup() {
 		DisableFlagsInUseLine: true,
 	}
 
+	dockerCmd.PersistentFlags().BoolP("help", "h", false, "Print usage")
+	dockerCmd.PersistentFlags().MarkShorthandDeprecated("help", "please use --help")
+	dockerCmd.PersistentFlags().Lookup("help").Hidden = true
+	dockerCmd.Flags().StringP("host", "H", "unix:///var/run/docker.sock", "Daemon socket to connect to")
+
 	attachCmd = &cobra.Command{
 		Use:   "attach [OPTIONS] CONTAINER",
 		Short: "Attach local standard input, output, and error streams to a running container",
