@@ -88,33 +88,33 @@ func (c *Client) GenAllTree() error {
 }
 
 // loadLongDescription gets long descriptions and examples from markdown.
-func (c *Client) loadLongDescription(parentCmd *cobra.Command, generator string) error {
-	for _, cmd := range parentCmd.Commands() {
-		if cmd.HasSubCommands() {
-			if err := c.loadLongDescription(cmd, generator); err != nil {
+func (c *Client) loadLongDescription(cmd *cobra.Command, generator string) error {
+	if cmd.HasSubCommands() {
+		for _, sub := range cmd.Commands() {
+			if err := c.loadLongDescription(sub, generator); err != nil {
 				return err
 			}
 		}
-		name := cmd.CommandPath()
-		if i := strings.Index(name, " "); i >= 0 {
-			// remove root command / binary name
-			name = name[i+1:]
-		}
-		if name == "" {
-			continue
-		}
-		mdFile := strings.ReplaceAll(name, " ", "_") + ".md"
-		sourcePath := filepath.Join(c.source, mdFile)
-		content, err := os.ReadFile(sourcePath)
-		if os.IsNotExist(err) {
-			log.Printf("WARN: %s does not exist, skipping Markdown examples for %s docs\n", mdFile, generator)
-			continue
-		}
-		if err != nil {
-			return err
-		}
-		applyDescriptionAndExamples(cmd, string(content))
 	}
+	name := cmd.CommandPath()
+	if i := strings.Index(name, " "); i >= 0 {
+		// remove root command / binary name
+		name = name[i+1:]
+	}
+	if name == "" {
+		return nil
+	}
+	mdFile := strings.ReplaceAll(name, " ", "_") + ".md"
+	sourcePath := filepath.Join(c.source, mdFile)
+	content, err := os.ReadFile(sourcePath)
+	if os.IsNotExist(err) {
+		log.Printf("WARN: %s does not exist, skipping Markdown examples for %s docs\n", mdFile, generator)
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	applyDescriptionAndExamples(cmd, string(content))
 	return nil
 }
 

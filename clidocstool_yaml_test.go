@@ -33,7 +33,7 @@ func TestGenYamlTree(t *testing.T) {
 	c, err := New(Options{
 		Root:      dockerCmd,
 		SourceDir: tmpdir,
-		Plugin:    true,
+		Plugin:    false,
 	})
 	require.NoError(t, err)
 	require.NoError(t, c.GenYamlTree(dockerCmd))
