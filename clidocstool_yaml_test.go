@@ -40,7 +40,7 @@ func TestGenYamlTree(t *testing.T) {
 
 	seen := make(map[string]struct{})
 
-	filepath.Walk("fixtures", func(path string, info fs.FileInfo, err error) error {
+	_ = filepath.Walk("fixtures", func(path string, info fs.FileInfo, _ error) error {
 		fname := filepath.Base(path)
 		// ignore dirs and any file that is not a .yaml file
 		if info.IsDir() || !strings.HasSuffix(fname, ".yaml") {
@@ -60,7 +60,7 @@ func TestGenYamlTree(t *testing.T) {
 		return nil
 	})
 
-	filepath.Walk(tmpdir, func(path string, info fs.FileInfo, err error) error {
+	_ = filepath.Walk(tmpdir, func(path string, info fs.FileInfo, _ error) error {
 		fname := filepath.Base(path)
 		// ignore dirs and any file that is not a .yaml file
 		if info.IsDir() || !strings.HasSuffix(fname, ".yaml") {
