@@ -16,7 +16,7 @@
 
 ARG GO_VERSION="1.18"
 ARG GOLANGCI_LINT_VERSION="v1.45"
-ARG ADDLICENSE_VERSION="v1.0.0"
+ARG ADDLICENSE_VERSION="v1.1.1"
 
 ARG LICENSE_ARGS="-c cli-docs-tool -l apache"
 ARG LICENSE_FILES=".*\(Dockerfile\|\.go\|\.hcl\|\.sh\)"
