@@ -49,7 +49,7 @@ func setup() {
 		SilenceUsage:          true,
 		SilenceErrors:         true,
 		TraverseChildren:      true,
-		Run:                   func(cmd *cobra.Command, args []string) {},
+		Run:                   func(*cobra.Command, []string) {},
 		Version:               "20.10.8",
 		DisableFlagsInUseLine: true,
 	}
@@ -65,7 +65,7 @@ func setup() {
 		Annotations: map[string]string{
 			"aliases": "docker container attach, docker attach",
 		},
-		Run: func(cmd *cobra.Command, args []string) {},
+		Run: func(*cobra.Command, []string) {},
 	}
 
 	attachFlags := attachCmd.Flags()
@@ -86,7 +86,7 @@ func setup() {
 		Use:     "build [OPTIONS] PATH | URL | -",
 		Aliases: []string{"b"},
 		Short:   "Start a build",
-		Run:     func(cmd *cobra.Command, args []string) {},
+		Run:     func(*cobra.Command, []string) {},
 		Annotations: map[string]string{
 			"aliases": "docker image build, docker buildx build, docker buildx b, docker build",
 		},
@@ -95,19 +95,19 @@ func setup() {
 		Use:   "dial-stdio",
 		Short: "Proxy current stdio streams to builder instance",
 		Args:  cobra.NoArgs,
-		Run:   func(cmd *cobra.Command, args []string) {},
+		Run:   func(*cobra.Command, []string) {},
 	}
 	buildxInstallCmd = &cobra.Command{
 		Use:    "install",
 		Short:  "Install buildx as a 'docker builder' alias",
 		Args:   cobra.ExactArgs(0),
-		Run:    func(cmd *cobra.Command, args []string) {},
+		Run:    func(*cobra.Command, []string) {},
 		Hidden: true,
 	}
 	buildxStopCmd = &cobra.Command{
 		Use:   "stop [NAME]",
 		Short: "Stop builder instance",
-		Run:   func(cmd *cobra.Command, args []string) {},
+		Run:   func(*cobra.Command, []string) {},
 	}
 
 	buildxPFlags := buildxCmd.PersistentFlags()
@@ -255,7 +255,7 @@ func TestGenAllTree(t *testing.T) {
 
 	seen := make(map[string]struct{})
 
-	filepath.Walk("fixtures", func(path string, info fs.FileInfo, err error) error {
+	_ = filepath.Walk("fixtures", func(path string, info fs.FileInfo, err error) error {
 		fname := filepath.Base(path)
 		// ignore dirs and .pre.md files
 		if info.IsDir() || strings.HasSuffix(fname, ".pre.md") {
@@ -275,7 +275,7 @@ func TestGenAllTree(t *testing.T) {
 		return nil
 	})
 
-	filepath.Walk(tmpdir, func(path string, info fs.FileInfo, err error) error {
+	_ = filepath.Walk(tmpdir, func(path string, info fs.FileInfo, _ error) error {
 		fname := filepath.Base(path)
 		// ignore dirs and .pre.md files
 		if info.IsDir() || strings.HasSuffix(fname, ".pre.md") {
