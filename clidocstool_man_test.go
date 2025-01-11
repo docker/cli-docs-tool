@@ -57,7 +57,7 @@ func TestGenManTree(t *testing.T) {
 	seen := make(map[string]struct{})
 	remanpage := regexp.MustCompile(`\.\d+$`)
 
-	filepath.Walk("fixtures", func(path string, info fs.FileInfo, err error) error {
+	_ = filepath.Walk("fixtures", func(path string, info fs.FileInfo, _ error) error {
 		fname := filepath.Base(path)
 		// ignore dirs and any file that is not a manpage
 		if info.IsDir() || !remanpage.MatchString(fname) {
@@ -77,7 +77,7 @@ func TestGenManTree(t *testing.T) {
 		return nil
 	})
 
-	filepath.Walk(tmpdir, func(path string, info fs.FileInfo, err error) error {
+	_ = filepath.Walk(tmpdir, func(path string, info fs.FileInfo, _ error) error {
 		fname := filepath.Base(path)
 		// ignore dirs and any file that is not a manpage
 		if info.IsDir() || !remanpage.MatchString(fname) {
