@@ -1,6 +1,6 @@
 module github.com/docker/cli-docs-tool/example
 
-go 1.20
+go 1.23.0
 
 require (
 	github.com/docker/buildx v0.11.2
