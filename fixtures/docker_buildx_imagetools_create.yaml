@@ -1,0 +1,33 @@
+command: docker buildx imagetools create
+short: Create a new image based on source images
+long: Create a new image based on source images
+usage: docker buildx imagetools create [OPTIONS] [SOURCE...]
+pname: docker buildx imagetools
+plink: docker_buildx_imagetools.yaml
+inherited_options:
+    - option: builder
+      value_type: string
+      description: Override the configured builder instance
+      deprecated: false
+      hidden: false
+      experimental: false
+      experimentalcli: false
+      kubernetes: false
+      swarm: false
+    - option: help
+      value_type: bool
+      default_value: "false"
+      description: Print usage
+      deprecated: false
+      hidden: true
+      experimental: false
+      experimentalcli: false
+      kubernetes: false
+      swarm: false
+deprecated: false
+hidden: true
+experimental: false
+experimentalcli: false
+kubernetes: false
+swarm: false
+

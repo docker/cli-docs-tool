@@ -169,6 +169,9 @@ func (c *Client) genYamlCustom(cmd *cobra.Command, w io.Writer) error {
 
 	// check recursively to handle inherited annotations
 	for curr := cmd; curr != nil; curr = curr.Parent() {
+		if curr.Hidden {
+			cliDoc.Hidden = true
+		}
 		if v, ok := curr.Annotations["version"]; ok && cliDoc.MinAPIVersion == "" {
 			cliDoc.MinAPIVersion = v
 		}
