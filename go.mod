@@ -1,6 +1,6 @@
 module github.com/docker/cli-docs-tool
 
-go 1.18
+go 1.23.0
 
 require (
 	github.com/spf13/cobra v1.8.1

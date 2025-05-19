@@ -352,9 +352,9 @@ func genFlagResult(cmd *cobra.Command, flags *pflag.FlagSet, anchors map[string]
 //
 // This makes the generated YAML more readable, and easier to review changes.
 // max can be used to customize the width to keep the whole line < 80 chars.
-func forceMultiLine(s string, max int) string {
+func forceMultiLine(s string, maxWidth int) string {
 	s = strings.TrimSpace(s)
-	if len(s) > max && !strings.Contains(s, "\n") {
+	if len(s) > maxWidth && !strings.Contains(s, "\n") {
 		s = s + "\n"
 	}
 	return s
