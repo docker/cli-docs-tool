@@ -32,13 +32,15 @@ import (
 )
 
 var (
-	dockerCmd          *cobra.Command
-	attachCmd          *cobra.Command
-	buildxCmd          *cobra.Command
-	buildxBuildCmd     *cobra.Command
-	buildxDialStdioCmd *cobra.Command
-	buildxInstallCmd   *cobra.Command
-	buildxStopCmd      *cobra.Command
+	dockerCmd                 *cobra.Command
+	attachCmd                 *cobra.Command
+	buildxCmd                 *cobra.Command
+	buildxBuildCmd            *cobra.Command
+	buildxDialStdioCmd        *cobra.Command
+	buildxImagetoolsCmd       *cobra.Command
+	buildxImagetoolsCreateCmd *cobra.Command
+	buildxInstallCmd          *cobra.Command
+	buildxStopCmd             *cobra.Command
 )
 
 //nolint:errcheck
@@ -95,6 +97,17 @@ func setup() {
 		Use:   "dial-stdio",
 		Short: "Proxy current stdio streams to builder instance",
 		Args:  cobra.NoArgs,
+		Run:   func(*cobra.Command, []string) {},
+	}
+	buildxImagetoolsCmd = &cobra.Command{
+		Use:    "imagetools",
+		Short:  "Commands to work on images in registry",
+		Run:    func(*cobra.Command, []string) {},
+		Hidden: true,
+	}
+	buildxImagetoolsCreateCmd = &cobra.Command{
+		Use:   "create [OPTIONS] [SOURCE...]",
+		Short: "Create a new image based on source images",
 		Run:   func(*cobra.Command, []string) {},
 	}
 	buildxInstallCmd = &cobra.Command{
@@ -223,6 +236,8 @@ format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 
 	buildxCmd.AddCommand(buildxBuildCmd)
 	buildxCmd.AddCommand(buildxDialStdioCmd)
+	buildxImagetoolsCmd.AddCommand(buildxImagetoolsCreateCmd)
+	buildxCmd.AddCommand(buildxImagetoolsCmd)
 	buildxCmd.AddCommand(buildxInstallCmd)
 	buildxCmd.AddCommand(buildxStopCmd)
 	dockerCmd.AddCommand(buildxCmd)
@@ -232,6 +247,11 @@ format: "default|<id>[=<socket>|<key>[,<key>]]"`)
 func TestGenAllTree(t *testing.T) {
 	setup()
 	tmpdir := t.TempDir()
+
+	// keep for testing
+	//tmpdir, err := os.MkdirTemp("", "cli-docs-tools")
+	//require.NoError(t, err)
+	//t.Log(tmpdir)
 
 	epoch, err := time.Parse("2006-Jan-02", "2020-Jan-10")
 	require.NoError(t, err)
