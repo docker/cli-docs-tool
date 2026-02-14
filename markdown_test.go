@@ -101,7 +101,6 @@ Last line.`,
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.doc, func(t *testing.T) {
 			out, _ := cleanupMarkDown(tc.in)
 			if out != tc.expected {
@@ -147,7 +146,6 @@ func TestConvertHTMLAnchor(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.in, func(t *testing.T) {
 			out, id := convertHTMLAnchor(tc.in)
 			if id != tc.id {

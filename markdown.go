@@ -74,7 +74,7 @@ func cleanupMarkDown(mdString string) (md string, anchors []string) {
 	var id string
 	// replace trailing whitespace per line, and handle custom anchors
 	lines := strings.Split(mdString, "\n")
-	for i := 0; i < len(lines); i++ {
+	for i := range lines {
 		lines[i] = strings.TrimRightFunc(lines[i], unicode.IsSpace)
 		lines[i], id = convertHTMLAnchor(lines[i])
 		if id != "" {

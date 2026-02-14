@@ -110,10 +110,10 @@ func (c *Client) GenMarkdownTree(cmd *cobra.Command) error {
 
 	cs := string(content)
 
-	start := strings.Index(cs, "<!---MARKER_GEN_START-->")
+	before, _, ok := strings.Cut(cs, "<!---MARKER_GEN_START-->")
 	end := strings.Index(cs, "<!---MARKER_GEN_END-->")
 
-	if start == -1 {
+	if !ok {
 		return fmt.Errorf("no start marker in %s", mdFile)
 	}
 	if end == -1 {
@@ -124,7 +124,7 @@ func (c *Client) GenMarkdownTree(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	cont := cs[:start] + "<!---MARKER_GEN_START-->" + "\n" + out + "\n" + cs[end:]
+	cont := before + "<!---MARKER_GEN_START-->" + "\n" + out + "\n" + cs[end:]
 
 	fi, err := os.Stat(targetPath)
 	if err != nil {

@@ -174,7 +174,7 @@ func copyFile(src string, dst string) error {
 func getAliases(cmd *cobra.Command) []string {
 	if a := cmd.Annotations["aliases"]; a != "" {
 		aliases := strings.Split(a, ",")
-		for i := 0; i < len(aliases); i++ {
+		for i := range aliases {
 			aliases[i] = strings.TrimSpace(aliases[i])
 		}
 		return aliases
