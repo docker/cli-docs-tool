@@ -25,8 +25,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra/doc"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 //nolint:errcheck
@@ -35,10 +33,15 @@ func TestGenManTree(t *testing.T) {
 	tmpdir := t.TempDir()
 
 	epoch, err := time.Parse("2006-Jan-02", "2020-Jan-10")
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Setenv("SOURCE_DATE_EPOCH", strconv.FormatInt(epoch.Unix(), 10))
 
-	require.NoError(t, copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md")))
+	err = copyFile(path.Join("fixtures", "buildx_stop.pre.md"), path.Join(tmpdir, "buildx_stop.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	c, err := New(Options{
 		Root:      dockerCmd,
@@ -51,8 +54,14 @@ func TestGenManTree(t *testing.T) {
 			Manual:  "Docker User Manuals",
 		},
 	})
-	require.NoError(t, err)
-	require.NoError(t, c.GenManTree(dockerCmd))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = c.GenManTree(dockerCmd)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	seen := make(map[string]struct{})
 	remanpage := regexp.MustCompile(`\.\d+$`)
@@ -65,14 +74,19 @@ func TestGenManTree(t *testing.T) {
 		}
 		t.Run(fname, func(t *testing.T) {
 			seen[fname] = struct{}{}
-			require.NoError(t, err)
 
 			bres, err := os.ReadFile(filepath.Join(tmpdir, fname))
-			require.NoError(t, err)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			bexc, err := os.ReadFile(path)
-			require.NoError(t, err)
-			assert.Equal(t, string(bexc), string(bres))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(bexc) != string(bres) {
+				t.Fatalf("expected:\n%s\ngot:\n%s", string(bexc), string(bres))
+			}
 		})
 		return nil
 	})
