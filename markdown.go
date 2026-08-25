@@ -45,7 +45,7 @@ func getSections(mdString string) map[string]string {
 		}
 		parts := strings.SplitN(s, "\n", 2)
 		if len(parts) == 2 {
-			sections[strings.ToLower(parts[0])] = parts[1]
+			sections[strings.ToLower(strings.TrimSpace(parts[0]))] = parts[1]
 		}
 	}
 	return sections
